@@ -11,15 +11,15 @@ import { UserService } from './service/user/user.service';
 import { UserRepository } from './repository/user.repository';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      load: [configuration],
-      isGlobal: true,
-      cache: true,
-    }),
-    TypeOrmModule.forRoot(dbConfig() as DatabaseConfig),
-    SystemModule,
-  ],
-  providers: [UserService, UserRepository],
+	imports: [
+		ConfigModule.forRoot({
+			load: [configuration],
+			isGlobal: true,
+			cache: true,
+		}),
+		TypeOrmModule.forRoot(dbConfig() as DatabaseConfig),
+		SystemModule,
+	],
+	providers: [UserService, UserRepository],
 })
 export class AppModule {}

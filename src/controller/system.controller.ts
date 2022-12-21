@@ -5,11 +5,10 @@ import { FastifyReply } from 'fastify';
 @Controller('system')
 @ApiTags('System')
 export class SystemController {
-
-  @Get('healthy')
-  @HttpCode(HttpStatus.OK)
-  @ApiResponse({ status: HttpStatus.OK })
-  public async healthy(@Res() res: FastifyReply): Promise<void> {
-    res.status(HttpStatus.OK).send();
-  }
+	@Get('healthy')
+	@HttpCode(HttpStatus.OK)
+	@ApiResponse({ status: HttpStatus.OK })
+	public async healthy(@Res() res: FastifyReply): Promise<void> {
+		res.status(HttpStatus.OK).send();
+	}
 }

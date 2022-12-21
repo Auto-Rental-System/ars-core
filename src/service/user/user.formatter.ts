@@ -5,9 +5,9 @@ import { User } from 'src/model';
 
 @Injectable()
 export class UserFormatter {
-  public toUserResponse(user: User): UserResponse {
-    return {
-      id: user.id,
-    };
-  }
+	public toUserResponse(user: User): UserResponse {
+		return {
+			id: user.id,
+		};
+	}
 }
