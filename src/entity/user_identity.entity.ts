@@ -3,7 +3,6 @@ import { UserEntity } from './user.entity';
 
 @Entity('user_identity')
 export class UserIdentityEntity {
-
 	@PrimaryGeneratedColumn()
 	id: number;
 
@@ -16,7 +15,7 @@ export class UserIdentityEntity {
 	@Column({
 		unique: true,
 	})
-  email: string;
+	email: string;
 
 	@Column({
 		name: 'first_name',
@@ -30,5 +29,4 @@ export class UserIdentityEntity {
 
 	@OneToMany(type => UserEntity, user => user.userIdentity, { cascade: true })
 	users: UserEntity[];
-
 }

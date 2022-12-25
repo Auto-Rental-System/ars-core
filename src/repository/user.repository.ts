@@ -20,7 +20,12 @@ export class UserRepository {
 	}
 
 	public async insertUser(user: User): Promise<User> {
-		const { raw } = await this.manager.createQueryBuilder().insert().into(UserEntity).values({}).execute();
+		const { raw } = await this.manager
+			.createQueryBuilder()
+			.insert()
+			.into(UserEntity)
+			.values({})
+			.execute();
 
 		return (await this.getById(raw[0].id)) as User;
 	}

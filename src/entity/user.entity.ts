@@ -1,4 +1,13 @@
-import { CreateDateColumn, Entity, PrimaryGeneratedColumn, Column, Unique, ManyToOne, JoinColumn, RelationId } from 'typeorm';
+import {
+	CreateDateColumn,
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	Unique,
+	ManyToOne,
+	JoinColumn,
+	RelationId,
+} from 'typeorm';
 import { UserIdentityEntity } from './user_identity.entity';
 
 export enum UserRole {
@@ -14,7 +23,6 @@ export enum UserStatus {
 @Entity('user')
 @Unique(['userIdentityId', 'role'])
 export class UserEntity {
-
 	@PrimaryGeneratedColumn()
 	id: number;
 
@@ -58,5 +66,4 @@ export class UserEntity {
 		name: 'user_identity_id',
 	})
 	userIdentityId: number;
-
 }
