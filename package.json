@@ -19,7 +19,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migration:generate": "ts-node --transpile-only ./node_modules/typeorm/cli.js --config src/config/orm.config.ts migration:generate -n",
+    "migration:run": "ts-node --transpile-only ./node_modules/typeorm/cli.js --config src/config/orm.config.ts migration:run"
   },
   "dependencies": {
     "@fastify/static": "^6.6.0",
@@ -32,7 +34,8 @@
     "pg": "^8.8.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "typeorm": "0.2.40"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
