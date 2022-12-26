@@ -22,9 +22,7 @@ export class AuthService {
 
 	public static userIdAttributeName = 'custom:user_id';
 
-	constructor(
-		private readonly configService: ConfigService
-	) {
+	constructor(private readonly configService: ConfigService) {
 		const awsConfig: AWSConfig = this.configService.get<AWSConfig>('aws') as AWSConfig;
 		this.cognitoConfig = awsConfig.cognito;
 
@@ -82,8 +80,8 @@ export class AuthService {
 			return {
 				Name: key,
 				Value: attributes[key] as string,
-			}
-		})
+			};
+		});
 
 		const input: AdminUpdateUserAttributesCommandInput = {
 			UserPoolId: this.cognitoConfig.userPoolId,
@@ -95,7 +93,6 @@ export class AuthService {
 
 		await this.client.send(command);
 	}
-
 }
 
 export class NotValidTokenError extends ApplicationError {}

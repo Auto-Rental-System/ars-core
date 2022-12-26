@@ -10,11 +10,7 @@ import { ApplicationError } from 'shared/error';
 
 @Injectable()
 export class UserService {
-
-	constructor(
-		private readonly userRepository: UserRepository,
-		private readonly authService: AuthService,
-	) {}
+	constructor(private readonly userRepository: UserRepository, private readonly authService: AuthService) {}
 
 	public async getById(id: number): Promise<User> {
 		const user = await this.userRepository.getById(id);
@@ -28,11 +24,12 @@ export class UserService {
 
 	public async getUserByToken(token: string): Promise<User> {
 		const account = await this.authService.getCognitoAccount(token);
-		const userId: Result<string> =
-			account.UserAttributes?.find(attribute => attribute.Name === AuthService.userIdAttributeName)?.Value;
+		const userId: Result<string> = account.UserAttributes?.find(
+			attribute => attribute.Name === AuthService.userIdAttributeName,
+		)?.Value;
 
 		if (!userId) {
-			throw new NoUserIdInTokenError()
+			throw new NoUserIdInTokenError();
 		}
 
 		return await this.getById(parseInt(userId));
@@ -55,7 +52,6 @@ export class UserService {
 
 		return user;
 	}
-
 }
 
 export class NoUserIdInTokenError extends ApplicationError {}

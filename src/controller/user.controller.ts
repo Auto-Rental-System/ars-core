@@ -14,8 +14,7 @@ export class UserController {
 		private readonly authService: AuthService,
 		private readonly userService: UserService,
 		private readonly userFormatter: UserFormatter,
-	) {
-	}
+	) {}
 
 	@Post('register')
 	@HttpCode(HttpStatus.OK)
@@ -34,5 +33,4 @@ export class UserController {
 	public async getCurrent(@Req() { user }: Request): Promise<UserResponse> {
 		return this.userFormatter.toUserResponse(user);
 	}
-
 }

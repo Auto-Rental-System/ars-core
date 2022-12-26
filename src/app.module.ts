@@ -8,7 +8,7 @@ import dbConfig from 'config/db.config';
 import { DatabaseConfig } from 'config/interfaces';
 
 import { UserService } from 'service/user';
-import { AuthService } from 'service/auth'
+import { AuthService } from 'service/auth';
 import { UserRepository } from 'repository';
 
 @Module({
