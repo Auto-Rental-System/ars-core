@@ -1,12 +1,15 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, HttpStatus } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
-import { UserService } from 'src/service/user/user.service';
-import { ApplicationError } from 'src/shared/error/applicationError';
+import { UserService } from 'service/user';
+import { ApplicationError } from 'shared/error';
 
 @Injectable()
 export class AuthenticationInterceptor implements NestInterceptor {
-	private endpointsToBypass = [{ url: '/system/healthy', method: 'GET' }];
+	private endpointsToBypass = [
+		{ url: '/system/healthy', method: 'GET' },
+		{ url: '/users/register', method: 'POST' },
+	];
 
 	constructor(private readonly userService: UserService) {}
 

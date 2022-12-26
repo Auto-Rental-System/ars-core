@@ -13,3 +13,14 @@ export interface SwaggerConfig {
 	description: string;
 	version: string;
 }
+
+export interface CognitoConfig {
+	region: string;
+	userPoolId: string;
+}
+
+export interface AWSConfig {
+	accessKeyId: string;
+	secretAccessKey: string;
+	cognito: CognitoConfig;
+}

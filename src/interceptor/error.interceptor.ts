@@ -2,7 +2,7 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nes
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { ApplicationError } from 'src/shared/error/applicationError';
+import { ApplicationError } from 'shared/error';
 
 @Injectable()
 export class ErrorInterceptor implements NestInterceptor {
