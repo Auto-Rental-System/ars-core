@@ -21,6 +21,16 @@ export class UserRepository {
 		return this.convertToModel(userEntity);
 	}
 
+	public async checkUserExistsByEmail(email: string): Promise<boolean> {
+		const count = await this.manager
+			.getRepository(UserIdentityEntity)
+			.createQueryBuilder('userIdentity')
+			.where({ email })
+			.getCount();
+
+		return count > 0;
+	}
+
 	public async insertUser(user: User): Promise<User> {
 		const { raw: userIdentityRaw } = await this.manager
 			.createQueryBuilder()

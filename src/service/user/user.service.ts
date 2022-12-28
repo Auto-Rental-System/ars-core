@@ -22,6 +22,14 @@ export class UserService {
 		return user;
 	}
 
+	public async ensureUserNotExistByEmail(email: string): Promise<void> {
+		const userExists = await this.userRepository.checkUserExistsByEmail(email);
+
+		if (userExists) {
+			throw new UserAlreadyExistsError();
+		}
+	}
+
 	public async getUserByToken(token: string): Promise<User> {
 		const account = await this.authService.getCognitoAccount(token);
 		const userId: Result<string> = account.UserAttributes?.find(
@@ -44,6 +52,8 @@ export class UserService {
 			UserRole.Renter,
 		);
 
+		await this.ensureUserNotExistByEmail(user.email);
+
 		user = await this.userRepository.insertUser(user);
 
 		// that's necessary to define user role using token
@@ -56,3 +66,4 @@ export class UserService {
 
 export class NoUserIdInTokenError extends ApplicationError {}
 export class UserNotFoundError extends ApplicationError {}
+export class UserAlreadyExistsError extends ApplicationError {}
