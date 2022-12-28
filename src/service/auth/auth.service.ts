@@ -9,6 +9,8 @@ import {
 	AdminGetUserCommandInput,
 	AdminUpdateUserAttributesCommand,
 	AdminUpdateUserAttributesCommandInput,
+	AdminConfirmSignUpCommandInput,
+	AdminConfirmSignUpCommand,
 	AttributeType,
 } from '@aws-sdk/client-cognito-identity-provider';
 
@@ -91,6 +93,16 @@ export class AuthService {
 
 		const command = new AdminUpdateUserAttributesCommand(input);
 
+		await this.client.send(command);
+	}
+
+	public async confirmSignUp(email: string): Promise<void> {
+		const input: AdminConfirmSignUpCommandInput = {
+			UserPoolId: this.cognitoConfig.userPoolId,
+			Username: email,
+		};
+
+		const command = new AdminConfirmSignUpCommand(input);
 		await this.client.send(command);
 	}
 }

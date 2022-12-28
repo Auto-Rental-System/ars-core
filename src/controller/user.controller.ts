@@ -23,6 +23,10 @@ export class UserController {
 		await this.authService.ensureCognitoAccountExists(body.email);
 
 		const user = await this.userService.registerUser(body);
+
+		// temporary to confirm sign up
+		await this.authService.confirmSignUp(user.email);
+
 		return this.userFormatter.toUserResponse(user);
 	}
 
