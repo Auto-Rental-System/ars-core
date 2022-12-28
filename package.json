@@ -24,6 +24,7 @@
     "migration:run": "ts-node --transpile-only ./node_modules/typeorm/cli.js --config src/config/orm.config.ts migration:run"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.238.0",
     "@fastify/static": "^6.6.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",

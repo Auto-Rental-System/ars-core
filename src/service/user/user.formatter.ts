@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserResponse } from 'src/interface/apiResponse';
-import { User } from 'src/model';
+import { UserResponse } from 'interface/apiResponse';
+import { User } from 'model';
 
 @Injectable()
 export class UserFormatter {

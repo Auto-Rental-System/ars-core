@@ -27,16 +27,6 @@ export class UserEntity {
 	id: number;
 
 	@Column({
-		name: 'first_name',
-	})
-	firstName: string;
-
-	@Column({
-		name: 'last_name',
-	})
-	lastName: string;
-
-	@Column({
 		type: 'enum',
 		enum: UserRole,
 	})
@@ -45,6 +35,7 @@ export class UserEntity {
 	@Column({
 		type: 'enum',
 		enum: UserStatus,
+		default: UserStatus.Active,
 	})
 	status: UserStatus;
 

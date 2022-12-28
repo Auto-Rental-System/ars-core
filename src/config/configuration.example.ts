@@ -22,6 +22,14 @@ export default () => ({
 		title: 'Boilerplate',
 		description: 'NestJS Boilerplate',
 	},
+	aws: {
+		accessKeyId: 'your-aws-accessKeyId',
+		secretAccessKey: 'your-aws-secretAccessKey',
+		cognito: {
+			region: 'your-aws-region',
+			userPoolId: 'your-aws-region',
+		},
+	},
 	cors: {
 		origin: 'cors-app-url',
 		methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
