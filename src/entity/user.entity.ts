@@ -7,8 +7,10 @@ import {
 	ManyToOne,
 	JoinColumn,
 	RelationId,
+	OneToMany,
 } from 'typeorm';
 import { UserIdentityEntity } from './user_identity.entity';
+import { CarEntity } from './car.entity';
 
 export enum UserRole {
 	Renter = 'Renter',
@@ -40,7 +42,6 @@ export class UserEntity {
 	status: UserStatus;
 
 	@CreateDateColumn({
-		nullable: true,
 		name: 'created_at',
 	})
 	createdAt: Date;
@@ -57,4 +58,7 @@ export class UserEntity {
 		name: 'user_identity_id',
 	})
 	userIdentityId: number;
+
+	@OneToMany(type => CarEntity, car => car.user, { cascade: true })
+	cars: CarEntity[];
 }

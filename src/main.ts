@@ -5,10 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 
 import { AppModule } from './app.module';
-import { SwaggerConfig } from './config/interfaces';
-import { ErrorInterceptor } from './interceptor/error.interceptor';
-import { AuthenticationInterceptor } from './interceptor/authentication.interceptor';
-import { UserService } from './service/user/user.service';
+import { SwaggerConfig } from 'config/interfaces';
+import { ErrorInterceptor } from 'interceptor';
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
@@ -31,8 +29,7 @@ async function bootstrap() {
 	const document = SwaggerModule.createDocument(app, config, options);
 	SwaggerModule.setup('api', app, document);
 
-	const userService = app.get(UserService);
-	app.useGlobalInterceptors(new AuthenticationInterceptor(userService), new ErrorInterceptor());
+	app.useGlobalInterceptors(new ErrorInterceptor());
 
 	const port = configService.get('port');
 
