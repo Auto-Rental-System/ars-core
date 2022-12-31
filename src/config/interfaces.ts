@@ -23,4 +23,12 @@ export interface AWSConfig {
 	accessKeyId: string;
 	secretAccessKey: string;
 	cognito: CognitoConfig;
+	s3: S3Config;
+}
+
+export interface S3Config {
+	bucket: string;
+	getUrlTtl: number;
+	postUrlTtl: number;
+	region: string;
 }
