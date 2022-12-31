@@ -1,12 +1,4 @@
-import {
-	CreateDateColumn,
-	Entity,
-	PrimaryGeneratedColumn,
-	Column,
-	ManyToOne,
-	JoinColumn,
-	RelationId,
-} from 'typeorm';
+import { CreateDateColumn, Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, RelationId } from 'typeorm';
 import { UserEntity } from './user.entity';
 
 export enum Fuel {
@@ -53,7 +45,7 @@ export class CarEntity {
 		type: 'enum',
 		enum: Fuel,
 	})
-	fuel: Fuel
+	fuel: Fuel;
 
 	// it will store from -99.9 to 99.9
 	@Column({
@@ -92,5 +84,4 @@ export class CarEntity {
 		name: 'user_id',
 	})
 	userId: number;
-
 }

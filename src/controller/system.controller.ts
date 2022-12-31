@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FastifyReply } from 'fastify';
 
@@ -6,7 +6,6 @@ import { FastifyReply } from 'fastify';
 @ApiTags('System')
 export class SystemController {
 	@Get('healthy')
-	@HttpCode(HttpStatus.OK)
 	@ApiResponse({ status: HttpStatus.OK })
 	public async healthy(@Res() res: FastifyReply): Promise<void> {
 		res.status(HttpStatus.OK).send();
