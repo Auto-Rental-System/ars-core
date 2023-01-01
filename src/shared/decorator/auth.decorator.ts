@@ -9,7 +9,7 @@ export function Auth(...roles: UserRole[]) {
 	return applyDecorators(
 		Roles(...roles),
 		UseGuards(AuthenticationGuard, RolesGuard),
-		ApiBearerAuth(),
+		ApiBearerAuth('authorization'),
 		ApiUnauthorizedResponse({ description: 'Unauthorized' }),
 	);
 }

@@ -12,8 +12,7 @@ export class UserRepository {
 
 	public async getById(id: number): Promise<Result<User>> {
 		const userEntity = await this.manager
-			.getRepository(UserEntity)
-			.createQueryBuilder('user')
+			.createQueryBuilder(UserEntity, 'user')
 			.leftJoinAndSelect('user.userIdentity', 'userIdentity')
 			.where('user.id = :id', { id })
 			.getOne();
@@ -23,8 +22,7 @@ export class UserRepository {
 
 	public async checkUserExistsByEmail(email: string): Promise<boolean> {
 		const count = await this.manager
-			.getRepository(UserIdentityEntity)
-			.createQueryBuilder('userIdentity')
+			.createQueryBuilder(UserIdentityEntity, 'userIdentity')
 			.where({ email })
 			.getCount();
 
