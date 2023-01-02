@@ -21,10 +21,7 @@ export class UserRepository {
 	}
 
 	public async checkUserExistsByEmail(email: string): Promise<boolean> {
-		const count = await this.manager
-			.createQueryBuilder(UserIdentityEntity, 'userIdentity')
-			.where({ email })
-			.getCount();
+		const count = await this.manager.createQueryBuilder(UserIdentityEntity, 'userIdentity').where({ email }).getCount();
 
 		return count > 0;
 	}

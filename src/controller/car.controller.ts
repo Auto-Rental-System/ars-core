@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Body, Req, HttpStatus, Param } from '@nestjs/common';
+import { Controller, Post, Put, Get, Body, Req, HttpStatus, Param } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 
 import { Auth } from 'shared/decorator';
@@ -18,6 +18,19 @@ export class CarController {
 	@ApiResponse({ status: HttpStatus.OK, type: CarResponse })
 	public async create(@Req() { user }: Request, @Body() body: CreateCarRequest): Promise<CarResponse> {
 		const car = await this.carService.create(body, user);
+		return this.carFormatter.toCarResponse(car);
+	}
+
+	@Get(':id')
+	@Auth()
+	@ApiParam({ name: 'id', required: true, type: Number })
+	@ApiResponse({ status: HttpStatus.OK, type: CarResponse })
+	public async getById(
+		@Req() { user }: Request,
+		@Param('id') id: number,
+	): Promise<CarResponse> {
+		const car = await this.carService.getById(id);
+
 		return this.carFormatter.toCarResponse(car);
 	}
 
