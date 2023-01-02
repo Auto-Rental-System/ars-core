@@ -40,3 +40,5 @@ export class CreateCarRequest {
 	@ApiProperty({ type: Number, minimum: 1 })
 	public readonly price: number;
 }
+
+export class UpdateCarRequest extends CreateCarRequest {}

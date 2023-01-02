@@ -10,14 +10,11 @@ export class CarRepository {
 	constructor(private manager: EntityManager) {}
 
 	public async getById(id: number): Promise<Result<Car>> {
-		const carEntity = await this.manager
-			.createQueryBuilder(CarEntity, 'car')
-			.where({ id })
-			.getOne();
-		
+		const carEntity = await this.manager.createQueryBuilder(CarEntity, 'car').where({ id }).getOne();
+
 		return this.convertToModel(carEntity);
 	}
-	
+
 	public async insert(car: Car): Promise<Car> {
 		const { identifiers } = await this.manager
 			.createQueryBuilder()
@@ -37,22 +34,44 @@ export class CarRepository {
 			})
 			.execute();
 
-		return await this.getById(identifiers[0].id);
+		return (await this.getById(identifiers[0].id)) as Car;
 	}
-	
+
+	public async update(car: Car): Promise<Car> {
+		await this.manager
+			.createQueryBuilder()
+			.update(CarEntity)
+			.set({
+				brand: car.brand,
+				model: car.model,
+				description: car.description,
+				fuel: car.fuel,
+				gearbox: car.gearbox,
+				engineCapacity: car.engineCapacity,
+				fuelConsumption: car.fuelConsumption,
+				pledge: car.pledge,
+				price: car.price,
+			})
+			.where({ id: car.id })
+			.execute();
+
+		return (await this.getById(car.id)) as Car;
+	}
 	private convertToModel(carEntity?: CarEntity): Result<Car> {
-		return new Car(
-			carEntity.brand,
-			carEntity.model,
-			carEntity.description,
-			carEntity.fuel,
-			carEntity.gearbox,
-			carEntity.engineCapacity,
-			carEntity.fuelConsumption,
-			carEntity.pledge,
-			carEntity.price,
-			carEntity.userId,
-			carEntity.id,
-		);
+		if (carEntity) {
+			return new Car(
+				carEntity.brand,
+				carEntity.model,
+				carEntity.description,
+				carEntity.fuel,
+				carEntity.gearbox,
+				carEntity.engineCapacity,
+				carEntity.fuelConsumption,
+				carEntity.pledge,
+				carEntity.price,
+				carEntity.userId,
+				carEntity.id,
+			);
+		}
 	}
 }
