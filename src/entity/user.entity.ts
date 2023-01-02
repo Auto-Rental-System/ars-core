@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { UserIdentityEntity } from './user_identity.entity';
 import { CarEntity } from './car.entity';
-import { CarRentalOrderEntity } from './car_rental_order.entity';
+import { RentalOrderEntity } from './rental_order.entity';
 
 export enum UserRole {
 	Renter = 'Renter',
@@ -63,6 +63,6 @@ export class UserEntity {
 	@OneToMany(type => CarEntity, car => car.user, { cascade: true })
 	cars: CarEntity[];
 
-	@OneToMany(type => CarRentalOrderEntity, order => order.user, { cascade: true })
-	orders: CarRentalOrderEntity[];
+	@OneToMany(type => RentalOrderEntity, order => order.user, { cascade: true })
+	orders: RentalOrderEntity[];
 }

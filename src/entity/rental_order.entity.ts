@@ -2,8 +2,8 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 import { UserEntity } from './user.entity';
 import { CarEntity } from './car.entity';
 
-@Entity('car_rental_order')
-export class CarRentalOrderEntity {
+@Entity('rental_order')
+export class RentalOrderEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
@@ -31,7 +31,7 @@ export class CarRentalOrderEntity {
 	@JoinColumn({ name: 'user_id' })
 	user: UserEntity;
 
-	@RelationId((order: CarRentalOrderEntity) => order.user)
+	@RelationId((order: RentalOrderEntity) => order.user)
 	@Column({
 		name: 'user_id',
 	})
@@ -44,7 +44,7 @@ export class CarRentalOrderEntity {
 	@JoinColumn({ name: 'car_id' })
 	car: CarEntity;
 
-	@RelationId((order: CarRentalOrderEntity) => order.car)
+	@RelationId((order: RentalOrderEntity) => order.car)
 	@Column({
 		name: 'car_id',
 	})

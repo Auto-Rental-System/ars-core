@@ -1,5 +1,5 @@
-import { Controller, Post, Put, Get, Body, Req, HttpStatus, Param } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
+import { Body, Controller, Get, HttpStatus, Param, Post, Put, Req } from '@nestjs/common';
+import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Auth } from 'shared/decorator';
 import { UserRole } from 'entity/user.entity';
@@ -25,10 +25,7 @@ export class CarController {
 	@Auth()
 	@ApiParam({ name: 'id', required: true, type: Number })
 	@ApiResponse({ status: HttpStatus.OK, type: CarResponse })
-	public async getById(
-		@Req() { user }: Request,
-		@Param('id') id: number,
-	): Promise<CarResponse> {
+	public async getById(@Req() { user }: Request, @Param('id') id: number): Promise<CarResponse> {
 		const car = await this.carService.getById(id);
 
 		return this.carFormatter.toCarResponse(car);
@@ -46,6 +43,16 @@ export class CarController {
 		let car = await this.carService.getById(id);
 
 		car = await this.carService.update(car, body);
+
+		return this.carFormatter.toCarResponse(car);
+	}
+
+	@Post('/:id/rent')
+	@Auth(UserRole.Renter)
+	@ApiParam({ name: 'id', required: true, type: Number })
+	@ApiResponse({ status: HttpStatus.OK, type: CarResponse })
+	public async rent(@Req() { user }: Request, @Param('id') id: number): Promise<CarResponse> {
+		const car = await this.carService.getById(id);
 
 		return this.carFormatter.toCarResponse(car);
 	}
