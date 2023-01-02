@@ -4,7 +4,7 @@ import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'shared/decorator';
 import { UserRole } from 'entity/user.entity';
 import { CarResponse } from 'interface/apiResponse';
-import { CreateCarRequest, UpdateCarRequest } from 'interface/apiRequest';
+import { CreateCarRequest, RentCarRequest, UpdateCarRequest } from 'interface/apiRequest';
 import { Request } from 'shared/request';
 import { CarFormatter, CarService } from 'service/car';
 
@@ -51,8 +51,14 @@ export class CarController {
 	@Auth(UserRole.Renter)
 	@ApiParam({ name: 'id', required: true, type: Number })
 	@ApiResponse({ status: HttpStatus.OK, type: CarResponse })
-	public async rent(@Req() { user }: Request, @Param('id') id: number): Promise<CarResponse> {
-		const car = await this.carService.getById(id);
+	public async rent(
+		@Req() { user }: Request,
+		@Param('id') id: number,
+		@Body() body: RentCarRequest,
+	): Promise<CarResponse> {
+		let car = await this.carService.getById(id);
+
+		car = await this.carService.rent(car, body, user);
 
 		return this.carFormatter.toCarResponse(car);
 	}

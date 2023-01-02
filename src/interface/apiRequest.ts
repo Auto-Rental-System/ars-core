@@ -42,3 +42,11 @@ export class CreateCarRequest {
 }
 
 export class UpdateCarRequest extends CreateCarRequest {}
+
+export class RentCarRequest {
+	@ApiProperty({ type: Date })
+	startAt: Date;
+
+	@ApiProperty({ type: Date })
+	endAt: Date;
+}
