@@ -1,16 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
-import { CreateCarRequest, RentCarRequest, UpdateCarRequest } from 'interface/apiRequest';
-import { Car, RentalOrder, User } from 'model';
-import { CarRepository, RentalOrderRepository } from 'repository';
+import { CreateCarRequest, UpdateCarRequest } from 'interface/apiRequest';
+import { Car, User } from 'model';
+import { CarRepository } from 'repository';
 import { ApplicationError } from 'shared/error';
 
 @Injectable()
 export class CarService {
-	constructor(
-		private readonly carRepository: CarRepository,
-		private readonly rentalOrderRepository: RentalOrderRepository,
-	) {}
+	constructor(private readonly carRepository: CarRepository) {}
 
 	public async getById(id: number): Promise<Car> {
 		const car = await this.carRepository.getById(id);
@@ -53,18 +50,6 @@ export class CarService {
 		car.price = body.price;
 
 		car = await this.carRepository.update(car);
-		return car;
-	}
-
-	public async rent(car: Car, body: RentCarRequest, user: User): Promise<Car> {
-		let rentalOrder = new RentalOrder(
-			body.startAt,
-			body.endAt,
-			user.id,
-			car.id,
-		)
-
-		rentalOrder = await this.rentalOrderRepository.insert(rentalOrder);
 		return car;
 	}
 }

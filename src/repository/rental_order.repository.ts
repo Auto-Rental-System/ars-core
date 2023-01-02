@@ -15,6 +15,12 @@ export class RentalOrderRepository {
 		return this.convertToModel(rentalOrderEntity);
 	}
 
+	public async getCarRentalOrders(carId: number): Promise<Array<RentalOrder>> {
+		const rentalOrderEntities = await this.manager.find(RentalOrderEntity, { carId });
+
+		return rentalOrderEntities.map(this.convertToModel) as Array<RentalOrder>;
+	}
+
 	public async insert(rentalOrder: RentalOrder): Promise<RentalOrder> {
 		const { identifiers } = await this.manager
 			.createQueryBuilder()

@@ -50,3 +50,19 @@ export class CarResponse {
 	@ApiProperty()
 	price: number;
 }
+
+export class RentalOrderResponse {
+	@ApiProperty({ type: Date })
+	startAt: Date;
+
+	@ApiProperty({ type: Date })
+	endAt: Date;
+
+	@ApiProperty({ type: Boolean })
+	orderedByMe: boolean;
+}
+
+export class DetailedCarResponse extends CarResponse {
+	@ApiProperty({ isArray: true, type: RentalOrderResponse })
+	rentalOrders: Array<RentalOrderResponse>;
+}
