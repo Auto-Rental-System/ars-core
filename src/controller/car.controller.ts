@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Auth } from 'shared/decorator';
@@ -34,8 +34,8 @@ export class CarController {
 	@ApiQuery({ name: 'filters', isArray: true, type: String, required: false })
 	@ApiResponse({ status: HttpStatus.OK, type: CarListResponse })
 	public async getAllCars(
-		@Query('page') page: number,
-		@Query('rowsPerPage') rowsPerPage: number,
+		@Query('page', ParseIntPipe) page: number,
+		@Query('rowsPerPage', ParseIntPipe) rowsPerPage: number,
 		@Query('order') order: Order = Order.Asc,
 		@Query('orderBy') orderBy: CarOrderBy = CarOrderBy.Price,
 		@Query('filters') filters: string | Array<string> = [],
@@ -62,7 +62,10 @@ export class CarController {
 	@Auth()
 	@ApiParam({ name: 'id', required: true, type: Number })
 	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
-	public async getById(@Req() { user }: Request, @Param('id') id: number): Promise<DetailedCarResponse> {
+	public async getById(
+		@Req() { user }: Request,
+		@Param('id', new ParseIntPipe()) id: number,
+	): Promise<DetailedCarResponse> {
 		const car = await this.carService.getById(id);
 		const rentalOrders = await this.carRentalService.getCarRentalOrders(car);
 
@@ -75,7 +78,7 @@ export class CarController {
 	@ApiResponse({ status: HttpStatus.OK, type: CarResponse })
 	public async update(
 		@Req() { user }: Request,
-		@Param('id') id: number,
+		@Param('id', ParseIntPipe) id: number,
 		@Body() body: UpdateCarRequest,
 	): Promise<CarResponse> {
 		let car = await this.carService.getById(id);
@@ -91,7 +94,7 @@ export class CarController {
 	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
 	public async rent(
 		@Req() { user }: Request,
-		@Param('id') id: number,
+		@Param('id', ParseIntPipe) id: number,
 		@Body() body: RentCarRequest,
 	): Promise<DetailedCarResponse> {
 		const car = await this.carService.getById(id);

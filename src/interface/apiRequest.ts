@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Fuel, Gearbox } from 'entity/car.entity';
+import { IsInt, IsNumber, Max, Min } from 'class-validator';
 
 export enum Order {
 	Asc = 'ASC',
@@ -38,15 +39,23 @@ export class CreateCarRequest {
 	@ApiProperty({ enum: Gearbox })
 	public readonly gearbox: Gearbox;
 
-	@ApiProperty({ type: Number, minimum: 1, maximum: 9 })
+	@IsNumber()
+	@Min(0.1)
+	@Max(9.9)
+	@ApiProperty({ type: Number, minimum: 0.1, maximum: 9.9 })
 	public readonly engineCapacity: number;
 
+	@IsNumber()
+	@Min(0.1)
+	@Max(99.9)
 	@ApiProperty({ minimum: 0.1, maximum: 99.9 })
 	public readonly fuelConsumption: number;
 
+	@IsInt()
 	@ApiProperty({ type: Number, minimum: 1 })
 	public readonly pledge: number;
 
+	@IsInt()
 	@ApiProperty({ type: Number, minimum: 1 })
 	public readonly price: number;
 }

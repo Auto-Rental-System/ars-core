@@ -49,7 +49,7 @@ export class CarEntity {
 		precision: 2,
 		scale: 1,
 	})
-	engineCapacity: number;
+	engineCapacity: string;
 
 	@Column({
 		type: 'enum',
@@ -64,7 +64,7 @@ export class CarEntity {
 		precision: 3,
 		scale: 1,
 	})
-	fuelConsumption: number;
+	fuelConsumption: string;
 
 	@Column({
 		type: 'enum',
