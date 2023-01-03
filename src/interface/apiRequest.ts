@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Fuel, Gearbox } from 'entity/car.entity';
-import { IsInt, IsNumber, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, Max, Min } from 'class-validator';
+import { ApiProperty } from 'shared/decorator';
 
 export enum Order {
 	Asc = 'ASC',
@@ -33,9 +33,11 @@ export class CreateCarRequest {
 	@ApiProperty()
 	public readonly description: string;
 
+	@IsEnum(Fuel)
 	@ApiProperty({ enum: Fuel })
 	public readonly fuel: Fuel;
 
+	@IsEnum(Gearbox)
 	@ApiProperty({ enum: Gearbox })
 	public readonly gearbox: Gearbox;
 
