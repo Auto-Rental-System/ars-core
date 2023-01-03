@@ -1,5 +1,15 @@
-import { CreateDateColumn, Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, RelationId } from 'typeorm';
+import {
+	CreateDateColumn,
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	ManyToOne,
+	JoinColumn,
+	RelationId,
+	OneToMany,
+} from 'typeorm';
 import { UserEntity } from './user.entity';
+import { RentalOrderEntity } from './rental_order.entity';
 
 export enum Fuel {
 	Petrol = 'Petrol',
@@ -39,7 +49,7 @@ export class CarEntity {
 		precision: 2,
 		scale: 1,
 	})
-	engineCapacity: number;
+	engineCapacity: string;
 
 	@Column({
 		type: 'enum',
@@ -54,7 +64,7 @@ export class CarEntity {
 		precision: 3,
 		scale: 1,
 	})
-	fuelConsumption: number;
+	fuelConsumption: string;
 
 	@Column({
 		type: 'enum',
@@ -84,4 +94,7 @@ export class CarEntity {
 		name: 'user_id',
 	})
 	userId: number;
+
+	@OneToMany(type => RentalOrderEntity, order => order.car, { cascade: true })
+	orders: RentalOrderEntity[];
 }
