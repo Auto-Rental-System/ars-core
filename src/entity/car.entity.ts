@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { RentalOrderEntity } from './rental_order.entity';
+import { CarImageEntity } from './car_image.entity';
 
 export enum Fuel {
 	Petrol = 'Petrol',
@@ -97,4 +98,7 @@ export class CarEntity {
 
 	@OneToMany(type => RentalOrderEntity, order => order.car, { cascade: true })
 	orders: RentalOrderEntity[];
+
+	@OneToMany(type => CarImageEntity, image => image.car, { cascade: true })
+	images: CarImageEntity[];
 }

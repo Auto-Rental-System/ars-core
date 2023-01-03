@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { CreateCarRequest, UpdateCarRequest } from 'interface/apiRequest';
 import { Car, User } from 'model';
-import { CarRepository } from 'repository';
+import { CarRepository, CarImageRepository } from 'repository';
 import { ApplicationError } from 'shared/error';
 import { PaginationResponse } from 'value_object';
 import { CarPaginationRequest } from 'value_object/pagination_request/car_pagination_request';
@@ -18,6 +18,7 @@ export class CarService {
 		private readonly carRepository: CarRepository,
 		private readonly storageService: StorageService,
 		private readonly configService: ConfigService,
+		private readonly carImageRepository: CarImageRepository,
 	) {
 		const carConfig: CarConfig = this.configService.get<CarConfig>('car') as CarConfig;
 		this.carConfig = carConfig;
