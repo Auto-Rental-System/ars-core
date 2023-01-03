@@ -82,3 +82,19 @@ export class CarListResponse {
 	@ApiProperty()
 	total: number;
 }
+
+export class ImageSignedPostUrlResponse {
+	@ApiProperty()
+	filename: string;
+
+	@ApiProperty()
+	url: string;
+
+	@ApiProperty()
+	fields: Record<string, string>;
+}
+
+export class CarImagesSignedPostUrlResponse {
+	@ApiProperty({ type: ImageSignedPostUrlResponse, isArray: true })
+	list: Array<ImageSignedPostUrlResponse>;
+}

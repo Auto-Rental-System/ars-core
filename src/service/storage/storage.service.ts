@@ -1,3 +1,4 @@
+import p from 'path';
 import { Readable } from 'stream';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -31,6 +32,7 @@ export interface PostFileInfo {
 
 export interface SignedPostUrlResponse {
 	key: string;
+	filename: string;
 	url: string;
 	fields: Record<string, string>;
 }
@@ -114,19 +116,23 @@ export class StorageService {
 		return await createPresignedPost(this.client, options);
 	}
 
-	public async getSignedPostUrls(filesInfo: Array<PostFileInfo>): Promise<Array<SignedPostUrlResponse>> {
-		const result: Array<SignedPostUrlResponse> = [];
-
-		const promises = filesInfo.map(async (fileInfo: PostFileInfo): Promise<void> => {
-			const response = await this.getSignedPostUrl(fileInfo.key, fileInfo.maxFileSize);
-			result.push({
-				key: fileInfo.key,
-				url: response.url,
-				fields: response.fields,
-			});
-		});
-
-		await Promise.all(promises);
+	public async getSignedPostUrls(
+		folder: string,
+		filenames: Array<string>,
+		maxFileSize: number,
+	): Promise<Array<SignedPostUrlResponse>> {
+		const result: Array<SignedPostUrlResponse> = await Promise.all(
+			filenames.map(async filename => {
+				const key = p.join(folder, filename);
+				const signedPost = await this.getSignedPostUrl(key, maxFileSize);
+				return {
+					key,
+					filename,
+					fields: signedPost.fields,
+					url: signedPost.url,
+				};
+			}),
+		);
 
 		return result;
 	}

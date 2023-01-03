@@ -3,7 +3,12 @@ import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Auth } from 'shared/decorator';
 import { UserRole } from 'entity/user.entity';
-import { CarListResponse, CarResponse, DetailedCarResponse } from 'interface/apiResponse';
+import {
+	CarImagesSignedPostUrlResponse,
+	CarListResponse,
+	CarResponse,
+	DetailedCarResponse,
+} from 'interface/apiResponse';
 import { CarOrderBy, CreateCarRequest, Order, RentCarRequest, UpdateCarRequest } from 'interface/apiRequest';
 import { Request } from 'shared/request';
 import { CarFormatter, CarRentalService, CarService } from 'service/car';
@@ -24,6 +29,22 @@ export class CarController {
 	public async create(@Req() { user }: Request, @Body() body: CreateCarRequest): Promise<CarResponse> {
 		const car = await this.carService.create(body, user);
 		return this.carFormatter.toCarResponse(car);
+	}
+
+	@Get('/:id/images/signed-urls/post')
+	@Auth(UserRole.Renter)
+	@ApiParam({ name: 'id', required: true, type: Number })
+	@ApiQuery({ name: 'filenames', isArray: true, type: String })
+	@ApiResponse({ status: HttpStatus.OK, type: CarImagesSignedPostUrlResponse })
+	public async getImagesSignedPostUrls(
+		@Req() { user }: Request,
+		@Param('id', ParseIntPipe) id: number,
+		@Query('filenames') filenames: Array<string>,
+	): Promise<CarImagesSignedPostUrlResponse> {
+		const car = await this.carService.getById(id);
+
+		const signedPostUrls = await this.carService.getImageSignedPostUrls(car, user, filenames);
+		return this.carFormatter.toCarImagesSignedPostUrlResponse(signedPostUrls);
 	}
 
 	@Get()

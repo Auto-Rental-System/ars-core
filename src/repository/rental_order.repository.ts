@@ -18,7 +18,7 @@ export class RentalOrderRepository {
 	public async getCarRentalOrders(carId: number): Promise<Array<RentalOrder>> {
 		const rentalOrderEntities = await this.manager.find(RentalOrderEntity, { carId });
 
-		return rentalOrderEntities.map((order) => this.convertToModel(order)) as Array<RentalOrder>;
+		return rentalOrderEntities.map(order => this.convertToModel(order)) as Array<RentalOrder>;
 	}
 
 	public async insert(rentalOrder: RentalOrder): Promise<RentalOrder> {

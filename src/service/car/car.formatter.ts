@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
 
 import { Car, RentalOrder, User } from 'model';
-import { CarListItemResponse, CarResponse, DetailedCarResponse, RentalOrderResponse } from 'interface/apiResponse';
+import {
+	CarImagesSignedPostUrlResponse,
+	CarListItemResponse,
+	CarResponse,
+	DetailedCarResponse,
+	RentalOrderResponse,
+} from 'interface/apiResponse';
+import { SignedPostUrlResponse } from 'service/storage';
 
 @Injectable()
 export class CarFormatter {
@@ -38,6 +45,20 @@ export class CarFormatter {
 	public toCarListItemResponse(car: Car): CarListItemResponse {
 		return {
 			...this.toCarResponse(car),
+		};
+	}
+
+	public toCarImagesSignedPostUrlResponse(
+		signedPostUrls: Array<SignedPostUrlResponse>,
+	): CarImagesSignedPostUrlResponse {
+		return {
+			list: signedPostUrls.map(signedPostUrl => {
+				return {
+					filename: signedPostUrl.filename,
+					url: signedPostUrl.filename,
+					fields: signedPostUrl.fields,
+				};
+			}),
 		};
 	}
 }

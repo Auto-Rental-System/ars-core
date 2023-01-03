@@ -6,10 +6,22 @@ import { CarRepository } from 'repository';
 import { ApplicationError } from 'shared/error';
 import { PaginationResponse } from 'value_object';
 import { CarPaginationRequest } from 'value_object/pagination_request/car_pagination_request';
+import { StorageService, SignedPostUrlResponse } from 'service/storage';
+import { ConfigService } from '@nestjs/config';
+import { CarConfig } from 'config/interfaces';
 
 @Injectable()
 export class CarService {
-	constructor(private readonly carRepository: CarRepository) {}
+	private readonly carConfig: CarConfig;
+
+	constructor(
+		private readonly carRepository: CarRepository,
+		private readonly storageService: StorageService,
+		private readonly configService: ConfigService,
+	) {
+		const carConfig: CarConfig = this.configService.get<CarConfig>('car') as CarConfig;
+		this.carConfig = carConfig;
+	}
 
 	public async getById(id: number): Promise<Car> {
 		const car = await this.carRepository.getById(id);
@@ -64,6 +76,21 @@ export class CarService {
 			result.total,
 			result.list,
 		);
+	}
+
+	public getS3FolderKey(car: Car, user: User): string {
+		return `user/${user.id}/car/${car.id}`;
+	}
+
+	public async getImageSignedPostUrls(
+		car: Car,
+		user: User,
+		filenames: Array<string>,
+	): Promise<Array<SignedPostUrlResponse>> {
+		const folder = this.getS3FolderKey(car, user);
+		const result = await this.storageService.getSignedPostUrls(folder, filenames, this.carConfig.maxImageSize);
+
+		return result;
 	}
 }
 
