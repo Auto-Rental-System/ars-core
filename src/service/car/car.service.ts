@@ -4,6 +4,8 @@ import { CreateCarRequest, UpdateCarRequest } from 'interface/apiRequest';
 import { Car, User } from 'model';
 import { CarRepository } from 'repository';
 import { ApplicationError } from 'shared/error';
+import { PaginationResponse } from 'value_object';
+import { CarPaginationRequest } from 'value_object/pagination_request/car_pagination_request';
 
 @Injectable()
 export class CarService {
@@ -51,6 +53,17 @@ export class CarService {
 
 		car = await this.carRepository.update(car);
 		return car;
+	}
+
+	public async getAllCars(paginationRequest: CarPaginationRequest): Promise<PaginationResponse<Car>> {
+		const result = await this.carRepository.getAllCars(paginationRequest);
+
+		return new PaginationResponse<Car>(
+			paginationRequest.page,
+			paginationRequest.rowsPerPage,
+			result.total,
+			result.list,
+		);
 	}
 }
 

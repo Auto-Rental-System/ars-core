@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { Car, RentalOrder, User } from 'model';
-import { CarResponse, DetailedCarResponse, RentalOrderResponse } from 'interface/apiResponse';
+import { CarListItemResponse, CarResponse, DetailedCarResponse, RentalOrderResponse } from 'interface/apiResponse';
 
 @Injectable()
 export class CarFormatter {
@@ -32,6 +32,12 @@ export class CarFormatter {
 		return {
 			...this.toCarResponse(car),
 			rentalOrders: rentalOrders.map(order => this.toRentalOrder(order, user)),
+		};
+	}
+
+	public toCarListItemResponse(car: Car): CarListItemResponse {
+		return {
+			...this.toCarResponse(car),
 		};
 	}
 }

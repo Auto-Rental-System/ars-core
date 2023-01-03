@@ -66,3 +66,19 @@ export class DetailedCarResponse extends CarResponse {
 	@ApiProperty({ isArray: true, type: RentalOrderResponse })
 	rentalOrders: Array<RentalOrderResponse>;
 }
+
+export class CarListItemResponse extends CarResponse {}
+
+export class CarListResponse {
+	@ApiProperty({ isArray: true, type: CarListItemResponse })
+	list: Array<CarListItemResponse>;
+
+	@ApiProperty()
+	page: number;
+
+	@ApiProperty()
+	rowsPerPage: number;
+
+	@ApiProperty()
+	total: number;
+}

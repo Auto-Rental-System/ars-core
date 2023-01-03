@@ -1,6 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Fuel, Gearbox } from 'entity/car.entity';
 
+export enum Order {
+	Asc = 'ASC',
+	Desc = 'DESC',
+}
+
+export enum CarOrderBy {
+	Price = 'car.price',
+	EngineCapacity = 'car.engine_capacity',
+}
+
 export class RegisterUserRequest {
 	@ApiProperty()
 	firstName: string;
