@@ -62,12 +62,29 @@ export class RentalOrderResponse {
 	orderedByMe: boolean;
 }
 
+export class CarImageResponse {
+	@ApiProperty()
+	filename: string;
+
+	@ApiProperty()
+	url: string;
+
+	@ApiProperty({ type: Boolean })
+	isTitle: boolean;
+}
+
 export class DetailedCarResponse extends CarResponse {
 	@ApiProperty({ isArray: true, type: RentalOrderResponse })
 	rentalOrders: Array<RentalOrderResponse>;
+
+	@ApiProperty({ type: CarImageResponse, isArray: true })
+	images: Array<CarImageResponse>;
 }
 
-export class CarListItemResponse extends CarResponse {}
+export class CarListItemResponse extends CarResponse {
+	@ApiProperty({ type: CarImageResponse })
+	titleImage?: CarImageResponse;
+}
 
 export class CarListResponse {
 	@ApiProperty({ isArray: true, type: CarListItemResponse })

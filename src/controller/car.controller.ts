@@ -43,7 +43,7 @@ export class CarController {
 	): Promise<CarImagesSignedPostUrlResponse> {
 		const car = await this.carService.getById(id);
 
-		const signedPostUrls = await this.carService.getImageSignedPostUrls(car, user, filenames);
+		const signedPostUrls = await this.carService.getImageSignedPostUrls(car, filenames);
 		return this.carFormatter.toCarImagesSignedPostUrlResponse(signedPostUrls);
 	}
 
@@ -72,7 +72,12 @@ export class CarController {
 		const result = await this.carService.getAllCars(paginationRequest);
 
 		return {
-			list: result.list.map(car => this.carFormatter.toCarListItemResponse(car)),
+			list: await Promise.all(
+				result.list.map(async car => {
+					const titleImage = await this.carService.getCarTitleImage(car);
+					return this.carFormatter.toCarListItemResponse(car, titleImage);
+				}),
+			),
 			page: result.page,
 			rowsPerPage: result.rowsPerPage,
 			total: result.total,
@@ -90,23 +95,27 @@ export class CarController {
 		const car = await this.carService.getById(id);
 		const rentalOrders = await this.carRentalService.getCarRentalOrders(car);
 
-		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, user);
+		const carImages = await this.carService.getCarImages(car, true);
+
+		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages, user);
 	}
 
 	@Put('/:id')
 	@Auth(UserRole.Renter)
 	@ApiParam({ name: 'id', required: true, type: Number })
-	@ApiResponse({ status: HttpStatus.OK, type: CarResponse })
+	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
 	public async update(
 		@Req() { user }: Request,
 		@Param('id', ParseIntPipe) id: number,
 		@Body() body: UpdateCarRequest,
-	): Promise<CarResponse> {
+	): Promise<DetailedCarResponse> {
 		let car = await this.carService.getById(id);
 
-		car = await this.carService.update(car, body);
+		car = await this.carService.updateCar(car, body);
+		const carImages = await this.carService.updateCarImages(car, body.images);
+		const rentalOrders = await this.carRentalService.getCarRentalOrders(car);
 
-		return this.carFormatter.toCarResponse(car);
+		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages, user);
 	}
 
 	@Post('/:id/rent')
@@ -121,7 +130,8 @@ export class CarController {
 		const car = await this.carService.getById(id);
 
 		const rentalOrders = await this.carRentalService.rent(car, body, user);
+		const carImages = await this.carService.getCarImages(car, true);
 
-		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, user);
+		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages, user);
 	}
 }

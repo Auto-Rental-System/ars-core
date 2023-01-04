@@ -6,5 +6,6 @@ export class CarImage {
 		public readonly isTitle: boolean,
 		public readonly carId: number,
 		public readonly id: number = NEW_ID,
+		public url?: string,
 	) {}
 }
