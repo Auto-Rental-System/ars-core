@@ -24,7 +24,7 @@ export class CarController {
 	) {}
 
 	@Post()
-	@Auth(UserRole.Renter)
+	@Auth(UserRole.Landlord)
 	@ApiResponse({ status: HttpStatus.OK, type: CarResponse })
 	public async create(@Req() { user }: Request, @Body() body: CreateCarRequest): Promise<CarResponse> {
 		const car = await this.carService.create(body, user);
@@ -50,8 +50,8 @@ export class CarController {
 	@Get()
 	@ApiQuery({ name: 'page', type: Number })
 	@ApiQuery({ name: 'rowsPerPage', type: Number })
-	@ApiQuery({ name: 'order', enum: Order, required: false })
-	@ApiQuery({ name: 'orderBy', enum: CarOrderBy, required: false })
+	@ApiQuery({ name: 'order', enum: Order, required: false, enumName: 'Order' })
+	@ApiQuery({ name: 'orderBy', enum: CarOrderBy, required: false, enumName: 'CarOrderBy', type: String })
 	@ApiQuery({ name: 'filters', isArray: true, type: String, required: false })
 	@ApiResponse({ status: HttpStatus.OK, type: CarListResponse })
 	public async getAllCars(

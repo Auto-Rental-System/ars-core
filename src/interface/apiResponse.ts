@@ -15,7 +15,7 @@ export class UserResponse {
 	@ApiProperty()
 	lastName: string;
 
-	@ApiProperty({ enum: UserRole })
+	@ApiProperty({ enum: UserRole, enumName: 'UserRole' })
 	role: UserRole;
 }
 
@@ -32,10 +32,10 @@ export class CarResponse {
 	@ApiProperty()
 	description: string;
 
-	@ApiProperty({ enum: Fuel })
+	@ApiProperty({ enum: Fuel, enumName: 'Fuel' })
 	fuel: Fuel;
 
-	@ApiProperty({ enum: Gearbox })
+	@ApiProperty({ enum: Gearbox, enumName: 'Gearbox' })
 	gearbox: Gearbox;
 
 	@ApiProperty()
@@ -82,7 +82,7 @@ export class DetailedCarResponse extends CarResponse {
 }
 
 export class CarListItemResponse extends CarResponse {
-	@ApiProperty({ type: CarImageResponse })
+	@ApiProperty({ type: CarImageResponse, required: false })
 	titleImage?: CarImageResponse;
 }
 

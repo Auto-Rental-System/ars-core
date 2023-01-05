@@ -1,9 +1,11 @@
 import { EntityManager, In } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 
 import { CarImageEntity } from 'entity/car_image.entity';
 import { CarImage } from 'model';
 import { Result } from 'shared/util/util';
 
+@Injectable()
 export class CarImageRepository {
 	constructor(private manager: EntityManager) {}
 
