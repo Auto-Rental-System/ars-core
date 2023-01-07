@@ -134,10 +134,10 @@ export class CarService {
 	public async updateCarImages(car: Car, images: Array<CarImageRequest>): Promise<Array<CarImage>> {
 		const carImages = await this.getCarImages(car);
 
-		const moreThanOneTitleImage = images.filter(image => image.isTitle).length > 1;
+		const notOneTitleImage = images.filter(image => image.isTitle).length !== 1;
 
-		if (moreThanOneTitleImage) {
-			throw new MoreThanOneTitleImageError();
+		if (notOneTitleImage) {
+			throw new NotOneTitleImageError();
 		}
 
 		const imagesFromRequestToAdd = images.filter(
@@ -188,4 +188,4 @@ export class CarService {
 
 export class CarNotExistError extends ApplicationError {}
 export class CarImageNotUploadedToS3Error extends ApplicationError {}
-export class MoreThanOneTitleImageError extends ApplicationError {}
+export class NotOneTitleImageError extends ApplicationError {}
