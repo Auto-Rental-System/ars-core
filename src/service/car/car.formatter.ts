@@ -71,7 +71,7 @@ export class CarFormatter {
 			list: signedPostUrls.map(signedPostUrl => {
 				return {
 					filename: signedPostUrl.filename,
-					url: signedPostUrl.filename,
+					url: signedPostUrl.url,
 					fields: signedPostUrl.fields,
 				};
 			}),

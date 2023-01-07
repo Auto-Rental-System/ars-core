@@ -1,4 +1,4 @@
-import p from 'path';
+import * as p from 'path';
 import { Readable } from 'stream';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';

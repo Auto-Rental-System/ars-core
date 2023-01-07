@@ -71,7 +71,7 @@ export class CarImageRequest {
 }
 
 export class UpdateCarRequest extends CreateCarRequest {
-	@ApiProperty({ type: String, isArray: true })
+	@ApiProperty({ type: CarImageRequest, isArray: true })
 	images: Array<CarImageRequest>;
 }
 

@@ -1,4 +1,4 @@
-import p from 'path';
+import * as p from 'path';
 import { Injectable } from '@nestjs/common';
 
 import { CarImageRequest, CreateCarRequest, UpdateCarRequest } from 'interface/apiRequest';
@@ -169,7 +169,7 @@ export class CarService {
 	}
 
 	public getS3FolderKey(car: Car): string {
-		return `/images/user/${car.userId}/car/${car.id}`;
+		return `images/user/${car.userId}/car/${car.id}`;
 	}
 
 	public getS3CarImageKey(car: Car, image: CarImage): string {

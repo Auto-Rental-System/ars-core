@@ -32,7 +32,7 @@ export class CarController {
 	}
 
 	@Get('/:id/images/signed-urls/post')
-	@Auth(UserRole.Renter)
+	@Auth(UserRole.Landlord)
 	@ApiParam({ name: 'id', required: true, type: Number })
 	@ApiQuery({ name: 'filenames', isArray: true, type: String })
 	@ApiResponse({ status: HttpStatus.OK, type: CarImagesSignedPostUrlResponse })
@@ -101,7 +101,7 @@ export class CarController {
 	}
 
 	@Put('/:id')
-	@Auth(UserRole.Renter)
+	@Auth(UserRole.Landlord)
 	@ApiParam({ name: 'id', required: true, type: Number })
 	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
 	public async update(

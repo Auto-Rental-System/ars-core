@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from 'entity/user.entity';
 import { Fuel, Gearbox } from 'entity/car.entity';
+import { CarOrderBy, Order } from './apiRequest';
 
 export class UserResponse {
 	@ApiProperty()
@@ -114,4 +115,12 @@ export class ImageSignedPostUrlResponse {
 export class CarImagesSignedPostUrlResponse {
 	@ApiProperty({ type: ImageSignedPostUrlResponse, isArray: true })
 	list: Array<ImageSignedPostUrlResponse>;
+}
+
+export class DevInfoResponse {
+	@ApiProperty({ enum: CarOrderBy, enumName: 'CarOrderBy' })
+	carOrderBy?: CarOrderBy;
+
+	@ApiProperty({ enum: Order, enumName: 'Order' })
+	order?: Order;
 }
