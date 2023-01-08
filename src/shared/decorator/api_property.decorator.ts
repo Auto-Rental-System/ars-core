@@ -3,8 +3,5 @@ import { ApiProperty as SwaggerApiProperty, ApiPropertyOptions } from '@nestjs/s
 import { IsNotEmpty } from 'class-validator';
 
 export function ApiProperty(options?: ApiPropertyOptions) {
-	return applyDecorators(
-		SwaggerApiProperty(options),
-		IsNotEmpty(),
-	)
+	return applyDecorators(SwaggerApiProperty(options), IsNotEmpty());
 }

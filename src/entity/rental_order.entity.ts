@@ -14,13 +14,13 @@ export class RentalOrderEntity {
 
 	@Column({
 		name: 'start_at',
-		type: 'timestamp',
+		type: 'date',
 	})
 	startAt: Date;
 
 	@Column({
 		name: 'end_at',
-		type: 'timestamp',
+		type: 'date',
 	})
 	endAt: Date;
 

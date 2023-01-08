@@ -62,7 +62,18 @@ export class CreateCarRequest {
 	public readonly price: number;
 }
 
-export class UpdateCarRequest extends CreateCarRequest {}
+export class CarImageRequest {
+	@ApiProperty()
+	filename: string;
+
+	@ApiProperty({ type: Boolean })
+	isTitle: boolean;
+}
+
+export class UpdateCarRequest extends CreateCarRequest {
+	@ApiProperty({ type: CarImageRequest, isArray: true })
+	images: Array<CarImageRequest>;
+}
 
 export class RentCarRequest {
 	@ApiProperty({ type: Date })
