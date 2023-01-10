@@ -17,23 +17,29 @@ export class UserController {
 		private readonly userFormatter: UserFormatter,
 	) {}
 
-	@Post('register')
+	@Post('/register')
 	@ApiResponse({ status: HttpStatus.OK, type: UserResponse })
 	public async register(@Body() body: RegisterUserRequest): Promise<UserResponse> {
 		await this.authService.ensureCognitoAccountExists(body.email);
 
 		const user = await this.userService.registerUser(body);
 
-		// temporary to confirm sign up
-		await this.authService.confirmSignUp(user.email);
-
 		return this.userFormatter.toUserResponse(user);
 	}
 
-	@Get('current')
+	@Get('/current')
 	@Auth()
 	@ApiResponse({ status: HttpStatus.OK, type: UserResponse })
 	public async getCurrent(@Req() { user }: Request): Promise<UserResponse> {
 		return this.userFormatter.toUserResponse(user);
+	}
+
+	@Post('/role/switch')
+	@Auth()
+	@ApiResponse({ status: HttpStatus.OK, type: UserResponse })
+	public async switchRole(@Req() { user }: Request): Promise<UserResponse> {
+		const updatedUser = await this.userService.switchRole(user);
+
+		return this.userFormatter.toUserResponse(updatedUser);
 	}
 }

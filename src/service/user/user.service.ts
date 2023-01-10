@@ -62,6 +62,22 @@ export class UserService {
 
 		return user;
 	}
+
+	public async switchRole(user: User): Promise<User> {
+		const requestedRole = user.is(UserRole.Renter) ? UserRole.Landlord : UserRole.Renter;
+
+		let newUser = await this.userRepository.getByIdentityAndRole(user.userIdentityId, requestedRole);
+
+		if (!newUser) {
+			newUser = new User(user.email, user.firstName, user.lastName, requestedRole, user.userIdentityId);
+			newUser = await this.userRepository.insertUser(newUser);
+		}
+
+		const attributes = { [AuthService.userIdAttributeName]: newUser.id.toString() };
+		await this.authService.updateAccountAttributes(newUser.email, attributes);
+
+		return newUser;
+	}
 }
 
 export class NoUserIdInTokenError extends ApplicationError {}
