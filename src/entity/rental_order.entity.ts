@@ -1,6 +1,16 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, RelationId } from 'typeorm';
+import {
+	Column,
+	CreateDateColumn,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	OneToMany,
+	PrimaryGeneratedColumn,
+	RelationId,
+} from 'typeorm';
 import { UserEntity } from './user.entity';
 import { CarEntity } from './car.entity';
+import { PaymentEntity } from './payment.entity';
 
 @Entity('rental_order')
 export class RentalOrderEntity {
@@ -55,4 +65,7 @@ export class RentalOrderEntity {
 		name: 'car_id',
 	})
 	carId: number;
+
+	@OneToMany(type => PaymentEntity, payment => payment.rentalOrder, { cascade: true })
+	payments: PaymentEntity[];
 }

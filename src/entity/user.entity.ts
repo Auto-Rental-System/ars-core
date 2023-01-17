@@ -12,6 +12,7 @@ import {
 import { UserIdentityEntity } from './user_identity.entity';
 import { CarEntity } from './car.entity';
 import { RentalOrderEntity } from './rental_order.entity';
+import { PaymentEntity } from './payment.entity';
 
 export enum UserRole {
 	Renter = 'Renter',
@@ -59,6 +60,9 @@ export class UserEntity {
 		name: 'user_identity_id',
 	})
 	userIdentityId: number;
+
+	@OneToMany(type => PaymentEntity, payment => payment.user, { cascade: true })
+	payments: PaymentEntity[];
 
 	@OneToMany(type => CarEntity, car => car.user, { cascade: true })
 	cars: CarEntity[];
