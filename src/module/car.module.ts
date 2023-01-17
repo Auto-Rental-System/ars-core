@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 
 import { CarController } from 'controller';
 import { CarService, CarRentalService, CarFormatter } from 'service/car';
+import { StorageService } from 'service/storage';
+import { PaypalService, PaypalClient } from 'service/paypal';
 import { CarImageRepository, CarRepository, RentalOrderRepository } from 'repository';
 import { AuthModule } from './auth.module';
-import { StorageService } from 'service/storage';
 
 @Module({
 	imports: [AuthModule],
@@ -17,6 +18,8 @@ import { StorageService } from 'service/storage';
 		RentalOrderRepository,
 		StorageService,
 		CarImageRepository,
+		PaypalService,
+		PaypalClient,
 	],
 })
 export class CarModule {}

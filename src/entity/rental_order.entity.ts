@@ -24,6 +24,12 @@ export class RentalOrderEntity {
 	})
 	endAt: Date;
 
+	@Column({
+		name: 'paypal_order_id',
+		unique: true,
+	})
+	paypalOrderId: string;
+
 	@ManyToOne(type => UserEntity, user => user.orders, {
 		onDelete: 'CASCADE',
 		nullable: false,

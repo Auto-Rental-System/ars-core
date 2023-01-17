@@ -81,4 +81,7 @@ export class RentCarRequest {
 
 	@ApiProperty({ type: Date })
 	endAt: Date;
+
+	@ApiProperty()
+	orderId: string;
 }

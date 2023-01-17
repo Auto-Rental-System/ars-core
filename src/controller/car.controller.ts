@@ -12,6 +12,7 @@ import {
 import { CarOrderBy, CreateCarRequest, Order, RentCarRequest, UpdateCarRequest } from 'interface/apiRequest';
 import { Request } from 'shared/request';
 import { CarFormatter, CarRentalService, CarService } from 'service/car';
+import { PaypalService } from 'service/paypal';
 import { CarPaginationRequest } from 'value_object/pagination_request/car_pagination_request';
 
 @Controller('cars')
@@ -21,6 +22,7 @@ export class CarController {
 		private readonly carService: CarService,
 		private readonly carFormatter: CarFormatter,
 		private readonly carRentalService: CarRentalService,
+		private readonly paypalService: PaypalService,
 	) {}
 
 	@Post()
@@ -118,7 +120,7 @@ export class CarController {
 		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages, user);
 	}
 
-	@Post('/:id/rent')
+	@Post('/:id/order')
 	@Auth(UserRole.Renter)
 	@ApiParam({ name: 'id', required: true, type: Number })
 	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
@@ -128,6 +130,10 @@ export class CarController {
 		@Body() body: RentCarRequest,
 	): Promise<DetailedCarResponse> {
 		const car = await this.carService.getById(id);
+
+		await this.paypalService.ensureCarRentalWasPaid(car, body);
+		await this.carRentalService.ensureNoRentalOrdersByPaypalOrderId(body.orderId);
+		await this.carRentalService.ensureNoCarRentalPeriodsIntercepts(car, body);
 
 		const rentalOrders = await this.carRentalService.rent(car, body, user);
 		const carImages = await this.carService.getCarImages(car, true);
