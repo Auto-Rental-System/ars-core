@@ -37,3 +37,9 @@ export interface CarConfig {
 	maxImageSize: number;
 	maxImagesCount: number;
 }
+
+export interface PaypalConfig {
+	clientId: string;
+	secret: string;
+	apiUrl: string;
+}

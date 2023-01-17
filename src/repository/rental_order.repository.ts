@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { Brackets, EntityManager } from 'typeorm';
 
 import { RentalOrder } from 'model';
 import { Result } from 'shared/util/util';
@@ -15,10 +15,35 @@ export class RentalOrderRepository {
 		return this.convertToModel(rentalOrderEntity);
 	}
 
-	public async getCarRentalOrders(carId: number): Promise<Array<RentalOrder>> {
+	public async getByCarId(carId: number): Promise<Array<RentalOrder>> {
 		const rentalOrderEntities = await this.manager.find(RentalOrderEntity, { carId });
 
 		return rentalOrderEntities.map(order => this.convertToModel(order)) as Array<RentalOrder>;
+	}
+
+	public async getByPaypalOrderIdCount(paypalOrderId: string): Promise<number> {
+		return await this.manager.count(RentalOrderEntity, { paypalOrderId });
+	}
+
+	public async getInPeriodCount(carId: number, startAt: Date, endAt: Date): Promise<number> {
+		return await this.manager
+			.createQueryBuilder(RentalOrderEntity, 'rentalOrder')
+			.where('rentalOrder.car_id = :carId', { carId })
+			.andWhere(
+				new Brackets(qb => {
+					return qb
+						.where('rentalOrder.start_at < :startAt', { startAt })
+						.andWhere('rentalOrder.end_at < :startAt', { startAt });
+				}),
+			)
+			.orWhere(
+				new Brackets(qb => {
+					return qb
+						.where('rentalOrder.start_at < :endAt', { endAt })
+						.andWhere('rentalOrder.end_at < :endAt', { endAt });
+				}),
+			)
+			.getCount();
 	}
 
 	public async insert(rentalOrder: RentalOrder): Promise<RentalOrder> {
@@ -31,6 +56,7 @@ export class RentalOrderRepository {
 				endAt: rentalOrder.endAt,
 				userId: rentalOrder.userId,
 				carId: rentalOrder.carId,
+				paypalOrderId: rentalOrder.paypalOrderId,
 			})
 			.execute();
 
@@ -44,6 +70,7 @@ export class RentalOrderRepository {
 				rentalOrderEntity.endAt,
 				rentalOrderEntity.userId,
 				rentalOrderEntity.carId,
+				rentalOrderEntity.paypalOrderId,
 				rentalOrderEntity.id,
 			);
 		}

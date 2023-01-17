@@ -30,9 +30,15 @@ export default () => ({
 			userPoolId: 'your-aws-region',
 		},
 	},
-	cors: {
-		origin: 'cors-app-url',
-		methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-		credentials: true,
+	car: {
+		maxImageSize: 2097152, // 2Mb
+		maxImagesCount: 10,
+	},
+	paypal: {
+		clientId: 'client_id',
+		secret: 'secret',
+		// For Sandbox: https://api-m.sandbox.paypal.com
+		// For Live: https://api-m.paypal.com
+		apiUrl: 'https://api-m.paypal.com',
 	},
 });
