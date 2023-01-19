@@ -59,6 +59,10 @@ export class PaymentRepository {
 	public async getCarPayments(carIds: Array<number>, type: PaymentType): Promise<Map<number, TotalPayment>> {
 		const totalPayments = new Map<number, TotalPayment>();
 
+		if (!carIds.length) {
+			return totalPayments;
+		}
+
 		const result: Array<TotalPaymentRaw> = await this.manager.query(`
 			SELECT
 				car_id,
@@ -67,10 +71,10 @@ export class PaymentRepository {
 				SUM(p.service_fee) as service_fee
 			FROM payment p
 			LEFT JOIN rental_order ro ON p.rental_order_id = ro.id
-			WHERE p.type = 'Checkout'
-			AND ro.car_id IN (5, 14)
+			WHERE p.type = ?
+			AND ro.car_id IN (?)
 			GROUP BY ro.car_id;
-		`);
+		`, [type, carIds]);
 
 		result.forEach(raw => {
 			totalPayments.set(raw.car_id, {
