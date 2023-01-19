@@ -4,7 +4,7 @@ import { CarController } from 'controller';
 import { CarService, CarRentalService, CarFormatter } from 'service/car';
 import { StorageService } from 'service/storage';
 import { PaypalService, PaypalClient } from 'service/paypal';
-import { CarImageRepository, CarRepository, RentalOrderRepository } from 'repository';
+import { CarImageRepository, CarRepository, RentalOrderRepository, PaymentRepository } from 'repository';
 import { AuthModule } from './auth.module';
 
 @Module({
@@ -20,6 +20,7 @@ import { AuthModule } from './auth.module';
 		CarImageRepository,
 		PaypalService,
 		PaypalClient,
+		PaymentRepository,
 	],
 })
 export class CarModule {}
