@@ -23,6 +23,7 @@ export class PaypalClient {
 
 	public async getOrderById(orderId: string): Promise<OrderResponse> {
 		const path = `/v2/checkout/orders/${orderId}`;
+		// TODO: Add "Not Found" handling
 
 		return await this.request<OrderResponse>(path, 'GET');
 	}
