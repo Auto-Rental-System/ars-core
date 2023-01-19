@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, RelationId, Unique } from 'typeorm';
+import {
+	Column,
+	CreateDateColumn,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+	RelationId,
+	Unique,
+} from 'typeorm';
 import { UserEntity } from './user.entity';
 import { RentalOrderEntity } from './rental_order.entity';
 
