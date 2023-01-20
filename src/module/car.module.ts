@@ -4,6 +4,7 @@ import { CarController } from 'controller';
 import { CarService, CarRentalService, CarFormatter } from 'service/car';
 import { StorageService } from 'service/storage';
 import { PaypalService, PaypalClient } from 'service/paypal';
+import { PaymentService } from 'service/payment';
 import { CarImageRepository, CarRepository, RentalOrderRepository, PaymentRepository } from 'repository';
 import { AuthModule } from './auth.module';
 
@@ -21,6 +22,7 @@ import { AuthModule } from './auth.module';
 		PaypalService,
 		PaypalClient,
 		PaymentRepository,
+		PaymentService,
 	],
 })
 export class CarModule {}

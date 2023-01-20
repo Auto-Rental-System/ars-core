@@ -4,7 +4,15 @@ import { URL } from 'url';
 
 import { PaypalConfig } from 'config/interfaces';
 import { Result } from 'shared/util/util';
-import { AuthenticationResponse, OrderResponse, Capture } from './types';
+import { ApplicationError } from 'shared/error';
+import {
+	AuthenticationResponse,
+	OrderResponse,
+	Capture,
+	CreatePayoutBody,
+	CreatePayoutResponse,
+	PayoutResponse,
+} from './types';
 
 @Injectable()
 export class PaypalClient {
@@ -23,9 +31,20 @@ export class PaypalClient {
 
 	public async getOrderById(orderId: string): Promise<OrderResponse> {
 		const path = `/v2/checkout/orders/${orderId}`;
-		// TODO: Add "Not Found" handling
 
 		return await this.request<OrderResponse>(path, 'GET');
+	}
+
+	public async createPayout(body: CreatePayoutBody): Promise<CreatePayoutResponse> {
+		const path = `/v1/payments/payouts`;
+
+		return await this.request<CreatePayoutResponse>(path, 'POST', body);
+	}
+
+	public async getPayoutByBatchId(payoutBatchId: string): Promise<PayoutResponse> {
+		const path = `/v1/payments/payouts/${payoutBatchId}`;
+
+		return await this.request<PayoutResponse>(path, 'GET');
 	}
 
 	private async getAccessToken(): Promise<string> {
@@ -73,6 +92,13 @@ export class PaypalClient {
 			return this.request(path, method, body);
 		}
 
+		// Not success status code
+		if (response.status < 200 || response.status >= 300) {
+			throw new UnexpectedPaypalResponse();
+		}
+
 		return (await response.json()) as T;
 	}
 }
+
+export class UnexpectedPaypalResponse extends ApplicationError {}

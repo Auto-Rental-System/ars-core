@@ -22,8 +22,7 @@ export class CarService {
 		private readonly configService: ConfigService,
 		private readonly carImageRepository: CarImageRepository,
 	) {
-		const carConfig: CarConfig = this.configService.get<CarConfig>('car') as CarConfig;
-		this.carConfig = carConfig;
+		this.carConfig = this.configService.get<CarConfig>('car') as CarConfig;
 	}
 
 	public async getById(id: number): Promise<Car> {

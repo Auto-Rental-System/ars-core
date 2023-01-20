@@ -20,19 +20,19 @@ export class RentalOrderEntity {
 	@CreateDateColumn({
 		name: 'created_at',
 	})
-	createdAt: Date;
+	createdAt: string;
 
 	@Column({
 		name: 'start_at',
 		type: 'date',
 	})
-	startAt: Date;
+	startAt: string;
 
 	@Column({
 		name: 'end_at',
 		type: 'date',
 	})
-	endAt: Date;
+	endAt: string;
 
 	@Column({
 		name: 'paypal_order_id',

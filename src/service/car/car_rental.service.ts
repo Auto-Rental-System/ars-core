@@ -1,38 +1,24 @@
 import { Injectable } from '@nestjs/common';
 
-import { Car, Payment, RentalOrder, User } from 'model';
+import { Car, RentalOrder, User } from 'model';
 import { RentCarRequest } from 'interface/apiRequest';
 import { ApplicationError } from 'shared/error';
-import { PaypalService } from 'service/paypal';
-import { PaymentType } from 'entity/payment.entity';
-import { PaymentRepository, RentalOrderRepository } from 'repository';
+import { PaymentService } from 'service/payment';
+import { RentalOrderRepository } from 'repository';
 
 @Injectable()
 export class CarRentalService {
 	constructor(
 		private readonly rentalOrderRepository: RentalOrderRepository,
-		private readonly paymentRepository: PaymentRepository,
-		private readonly paypalService: PaypalService,
+		private readonly paymentService: PaymentService,
 	) {}
 
 	public async rent(car: Car, body: RentCarRequest, user: User): Promise<Array<RentalOrder>> {
-		const rentalOrder = new RentalOrder(body.startAt, body.endAt, user.id, car.id, body.orderId);
+		let rentalOrder = new RentalOrder(body.startAt, body.endAt, user.id, car.id, body.orderId);
 
-		await this.rentalOrderRepository.insert(rentalOrder);
+		rentalOrder = await this.rentalOrderRepository.insert(rentalOrder);
 
-		const order = await this.paypalService.getOrderById(body.orderId);
-		const captures = order.purchase_units[0].payments?.captures || [];
-
-		const { grossValue, paypalFee } = captures.reduce(
-			(acc, c) => ({
-				grossValue: acc.grossValue + parseInt(c.seller_receivable_breakdown?.gross_amount?.value || '0'),
-				paypalFee: acc.paypalFee + parseInt(c.seller_receivable_breakdown?.paypal_fee?.value || '0'),
-			}),
-			{ grossValue: 0, paypalFee: 0 },
-		);
-
-		const payment = new Payment(rentalOrder.id, user.id, PaymentType.Checkout, grossValue, paypalFee);
-		await this.paymentRepository.insert(payment);
+		await this.paymentService.createCheckoutPayment(body.orderId, rentalOrder);
 
 		return await this.getCarRentalOrders(car);
 	}
@@ -50,7 +36,6 @@ export class CarRentalService {
 		{ startAt, endAt }: { startAt: Date; endAt: Date },
 	): Promise<void> {
 		const ordersInPeriod = await this.rentalOrderRepository.getInPeriodCount(car.id, startAt, endAt);
-		console.log({ ordersInPeriod });
 
 		if (ordersInPeriod) {
 			throw new CarIsRentedInEnteredPeriodError();
@@ -59,6 +44,10 @@ export class CarRentalService {
 
 	public async getCarRentalOrders(car: Car): Promise<Array<RentalOrder>> {
 		return await this.rentalOrderRepository.getByCarId(car.id);
+	}
+
+	public async getRentalOrdersToPayout(): Promise<Array<RentalOrder>> {
+		return await this.rentalOrderRepository.getRentalOrdersToPayout();
 	}
 }
 
