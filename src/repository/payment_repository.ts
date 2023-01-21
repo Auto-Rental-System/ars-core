@@ -3,7 +3,7 @@ import { EntityManager, In } from 'typeorm';
 
 import { Result } from 'shared/util/util';
 import { Payment } from 'model';
-import { PaymentEntity, PaymentType } from 'entity/payment.entity';
+import { PaymentEntity, PaymentStatus, PaymentType } from 'entity/payment.entity';
 
 export interface TotalPayment {
 	grossValue: number;
@@ -41,6 +41,7 @@ export class PaymentRepository {
 				grossValue: payment.grossValue.toString(),
 				paypalFee: payment.paypalFee.toString(),
 				serviceFee: payment.serviceFee.toString(),
+				paypalPayoutId: payment.paypalPayoutId,
 			})
 			.execute();
 
@@ -54,6 +55,21 @@ export class PaymentRepository {
 			.getOne();
 
 		return this.convertToModel(paymentEntity);
+	}
+
+	public async getByPaypalPayoutId(paypalPayoutId: string): Promise<Result<Payment>> {
+		const paymentEntity = await this.manager
+			.createQueryBuilder(PaymentEntity, 'payment')
+			.where({ paypalPayoutId })
+			.getOne();
+
+		return this.convertToModel(paymentEntity);
+	}
+
+	public async setPaymentStatus(id: number, status: PaymentStatus): Promise<Payment> {
+		await this.manager.createQueryBuilder().update(PaymentEntity).set({ status }).where({ id }).execute();
+
+		return (await this.getById(id)) as Payment;
 	}
 
 	//carId, TotalPayment
@@ -110,6 +126,7 @@ export class PaymentRepository {
 				parseFloat(paymentEntity.grossValue),
 				parseFloat(paymentEntity.paypalFee),
 				parseFloat(paymentEntity.serviceFee),
+				paymentEntity.paypalPayoutId,
 				paymentEntity.id,
 			);
 		}

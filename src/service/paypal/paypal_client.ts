@@ -12,6 +12,8 @@ import {
 	CreatePayoutBody,
 	CreatePayoutResponse,
 	PayoutResponse,
+	VerifyWebhookBody,
+	VerifyWebhookResponse,
 } from './types';
 
 @Injectable()
@@ -21,6 +23,12 @@ export class PaypalClient {
 
 	constructor(private readonly configService: ConfigService) {
 		this.config = configService.get('paypal') as PaypalConfig;
+	}
+
+	public async verifyWebhookSignature(body: VerifyWebhookBody): Promise<VerifyWebhookResponse> {
+		const path = `/v1/notifications/verify-webhook-signature`;
+
+		return await this.request<VerifyWebhookResponse>(path, 'POST', body);
 	}
 
 	public async getPayment(captureId: string): Promise<Capture> {
@@ -93,7 +101,7 @@ export class PaypalClient {
 		}
 
 		// Not success status code
-		if (response.status.toString().startsWith('2')) {
+		if (!response.status.toString().startsWith('2')) {
 			throw new UnexpectedPaypalResponse();
 		}
 

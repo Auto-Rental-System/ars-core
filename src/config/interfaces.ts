@@ -42,6 +42,7 @@ export interface PaypalConfig {
 	clientId: string;
 	secret: string;
 	apiUrl: string;
+	webhookId: string;
 }
 
 export interface PayoutConfig {

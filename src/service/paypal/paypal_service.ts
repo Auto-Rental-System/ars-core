@@ -1,18 +1,43 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as dayjs from 'dayjs';
+import { FastifyRequest } from 'fastify';
 
 import { ApplicationError } from 'shared/error';
 import { Car } from 'model';
 import { RentCarRequest } from 'interface/apiRequest';
 import { PaypalClient } from './paypal_client';
-import { CreatePayoutBody, CreatePayoutResponse, OrderResponse, PayoutResponse } from './types';
+import { CreatePayoutBody, CreatePayoutResponse, OrderResponse, PayoutResponse, VerifyWebhookBody } from './types';
+import { PaypalConfig } from 'config/interfaces';
 
 @Injectable()
 export class PaypalService {
-	constructor(private readonly paypalClient: PaypalClient) {}
+	private paypalConfig: PaypalConfig;
+
+	constructor(private readonly paypalClient: PaypalClient, private readonly configService: ConfigService) {
+		this.paypalConfig = this.configService.get('paypal') as PaypalConfig;
+	}
 
 	public async getOrderById(orderId: string): Promise<OrderResponse> {
 		return await this.paypalClient.getOrderById(orderId);
+	}
+
+	public async verifyWebhook(req: FastifyRequest): Promise<void> {
+		const body: VerifyWebhookBody = {
+			webhook_id: this.paypalConfig.webhookId,
+			auth_algo: req.headers['paypal-auth-algo'] as string,
+			cert_url: req.headers['paypal-cert-url'] as string,
+			transmission_id: req.headers['paypal-transmission-id'] as string,
+			transmission_sig: req.headers['paypal-transmission-sig'] as string,
+			transmission_time: req.headers['paypal-transmission-time'] as string,
+			webhook_event: req.body,
+		};
+
+		const response = await this.paypalClient.verifyWebhookSignature(body);
+
+		if (response.verification_status === 'FAILURE') {
+			throw new NotVerifiedPaypalWebhookSignatureError();
+		}
 	}
 
 	public async ensureOrderWasPaidProperly(orderId: string, expectedPayment: number): Promise<void> {
@@ -49,7 +74,7 @@ export class PaypalService {
 		}, 0);
 
 		if (orderTotalValue !== expectedPayment) {
-			throw new UnexpectedOrderValue('Unexpected Order Total Value', HttpStatus.BAD_REQUEST, {
+			throw new UnexpectedOrderValueError('Unexpected Order Total Value', HttpStatus.BAD_REQUEST, {
 				expected: expectedPayment,
 				received: orderTotalValue,
 			});
@@ -76,4 +101,5 @@ export class NotCompletedOrderError extends ApplicationError {}
 export class WrongCurrencyError extends ApplicationError {}
 export class CaptureIsNotCapturedError extends ApplicationError {}
 export class InvalidOrderError extends ApplicationError {}
-export class UnexpectedOrderValue extends ApplicationError {}
+export class UnexpectedOrderValueError extends ApplicationError {}
+export class NotVerifiedPaypalWebhookSignatureError extends ApplicationError {}
