@@ -163,31 +163,67 @@ export interface PayoutBatchHeader {
 	time_created?: string;
 }
 
+export type PayoutItemTransactionStatus =
+	| 'SUCCESS'
+	| 'FAILED'
+	| 'PENDING'
+	| 'UNCLAIMED'
+	| 'RETURNED'
+	| 'ONHOLD'
+	| 'BLOCKED'
+	| 'REFUNDED'
+	| 'REVERSED';
+
+export interface PayoutResponseItem {
+	payout_batch_id: string;
+	payout_item: PayoutItem;
+	payout_item_id: string;
+	activity_id?: string;
+	currency_conversion?: any;
+	errors?: {
+		debug_id: string;
+		message: string;
+		name: string;
+		details?: Array<{
+			issue: string;
+			description?: string;
+			field?: string;
+			location?: string;
+			value?: string;
+		}>;
+	};
+	links: Array<LinkDescription>;
+	payout_item_fee: AmountWithCurrency;
+	time_processed: string;
+	transaction_id: string;
+	transaction_status: PayoutItemTransactionStatus;
+}
+
 export interface PayoutResponse {
 	batch_header: PayoutBatchHeader;
-	items: {
-		payout_batch_id: string;
-		payout_item: any;
-		payout_item_id: string;
-		activity_id?: string;
-		currency_conversion?: any;
-		errors: any;
-		links: Array<LinkDescription>;
-		payout_item_fee: any;
-		time_processed: string;
-		transaction_id: string;
-		transaction_status:
-			| 'SUCCESS'
-			| 'FAILED'
-			| 'PENDING'
-			| 'UNCLAIMED'
-			| 'RETURNED'
-			| 'ONHOLD'
-			| 'BLOCKED'
-			| 'REFUNDED'
-			| 'REVERSED';
-	};
+	items: Array<PayoutResponseItem>;
 	links: Array<LinkDescription>;
 	total_items: number;
 	total_pages: number;
+}
+
+export type PaypalWebhookEventType =
+	| 'PAYMENT.PAYOUTS-ITEM.BLOCKED'
+	| 'PAYMENT.PAYOUTS-ITEM.CANCELED'
+	| 'PAYMENT.PAYOUTS-ITEM.DENIED'
+	| 'PAYMENT.PAYOUTS-ITEM.FAILED'
+	| 'PAYMENT.PAYOUTS-ITEM.HELD'
+	| 'PAYMENT.PAYOUTS-ITEM.REFUNDED'
+	| 'PAYMENT.PAYOUTS-ITEM.RETURNED'
+	| 'PAYMENT.PAYOUTS-ITEM.SUCCEEDED'
+	| 'PAYMENT.PAYOUTS-ITEM.UNCLAIMED';
+
+export interface PaypalWebhookBody<T> {
+	id: string;
+	event_version: string;
+	create_time: string;
+	resource_type: string;
+	event_type: PaypalWebhookEventType;
+	summary: string;
+	resource: T;
 }

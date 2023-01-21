@@ -2,11 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { PaymentRepository } from 'repository';
-import { CreatePayoutBody, PayoutBatchHeader, PaypalService } from 'service/paypal';
+import {
+	CreatePayoutBody,
+	PayoutItemTransactionStatus,
+	PaypalService,
+} from 'service/paypal';
 import { Payment, RentalOrder, User } from 'model';
 import { PaymentStatus, PaymentType } from 'entity/payment.entity';
-import { Result } from 'shared/util/util';
 import { PayoutConfig } from 'config/interfaces';
+import { Result } from 'shared/util/util';
+import { ApplicationError } from 'shared/error';
 
 @Injectable()
 export class PaymentService {
@@ -20,8 +25,32 @@ export class PaymentService {
 		this.payoutConfig = this.configService.get('payout') as PayoutConfig;
 	}
 
+	public async getById(id: number): Promise<Payment> {
+		const payment = await this.paymentRepository.getById(id);
+
+		if (!payment) {
+			throw new PaymentDoesNotExists();
+		}
+
+		return payment;
+	}
+
+	public async getByPaypalPayoutId(paypalPayoutId: string): Promise<Payment> {
+		const payment = await this.paymentRepository.getByPaypalPayoutId(paypalPayoutId);
+
+		if (!payment) {
+			throw new PaymentDoesNotExists();
+		}
+
+		return payment;
+	}
+
 	public async getByRentalOrderAndType(order: RentalOrder, type: PaymentType): Promise<Result<Payment>> {
 		return await this.paymentRepository.getByRentalOrderIdAndType(order.id, type);
+	}
+
+	public async setPaymentStatus(payment: Payment, status: PaymentStatus): Promise<Payment> {
+		return this.paymentRepository.setPaymentStatus(payment.id, status);
 	}
 
 	public async createCheckoutPayment(paypalOrderId: string, rentalOrder: RentalOrder): Promise<Payment> {
@@ -47,16 +76,20 @@ export class PaymentService {
 		return this.paymentRepository.insert(payment);
 	}
 
-	private projectPayoutBatchStatus(batchStatus: PayoutBatchHeader['batch_status']): PaymentStatus {
-		const projection: Record<PayoutBatchHeader['batch_status'], PaymentStatus> = {
-			DENIED: PaymentStatus.Denied,
-			PENDING: PaymentStatus.Pending,
-			PROCESSING: PaymentStatus.Processing,
+	public projectPayoutItemStatus(transactionStatus: PayoutItemTransactionStatus): PaymentStatus {
+		const projection: Record<PayoutItemTransactionStatus, PaymentStatus> = {
 			SUCCESS: PaymentStatus.Success,
-			CANCELED: PaymentStatus.Canceled,
+			FAILED: PaymentStatus.Failed,
+			PENDING: PaymentStatus.Pending,
+			UNCLAIMED: PaymentStatus.Unclaimed,
+			RETURNED: PaymentStatus.Returned,
+			ONHOLD: PaymentStatus.OnHold,
+			BLOCKED: PaymentStatus.Blocked,
+			REFUNDED: PaymentStatus.Refunded,
+			REVERSED: PaymentStatus.Reversed,
 		};
 
-		return projection[batchStatus];
+		return projection[transactionStatus];
 	}
 
 	public async createPayoutPayment(
@@ -89,18 +122,22 @@ export class PaymentService {
 		};
 		const createPayoutResponse = await this.paypalService.createPayout(body);
 		const payout = await this.paypalService.getPayoutByBatchId(createPayoutResponse.batch_header.payout_batch_id);
+		const payoutItem = payout.items[0];
 
 		let payoutPayment = new Payment(
 			rentalOrder.id,
 			landlord.id,
 			PaymentType.Payout,
-			this.projectPayoutBatchStatus(payout.batch_header.batch_status),
-			parseFloat(payout.batch_header.amount.value),
-			parseFloat(payout.batch_header.fees.value),
+			this.projectPayoutItemStatus(payoutItem.transaction_status),
+			parseFloat(payoutItem.payout_item.amount.value),
+			parseFloat(payoutItem.payout_item_fee.value),
 			serviceFee,
+			payoutItem.payout_item_id,
 		);
 		payoutPayment = await this.paymentRepository.insert(payoutPayment);
 
 		return payoutPayment;
 	}
 }
+
+export class PaymentDoesNotExists extends ApplicationError {}

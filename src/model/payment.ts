@@ -13,6 +13,7 @@ export class Payment {
 		public readonly paypalFee: number = 0,
 		// from 0 to 9999.99
 		public readonly serviceFee: number = 0,
+		public readonly paypalPayoutId?: string,
 		public id: number = NEW_ID,
 	) {}
 

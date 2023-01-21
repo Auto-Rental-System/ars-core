@@ -17,11 +17,15 @@ export enum PaymentType {
 }
 
 export enum PaymentStatus {
-	Denied = 'Denied',
-	Pending = 'Pending',
-	Processing = 'Processing',
 	Success = 'Success',
-	Canceled = 'Canceled',
+	Failed = 'Failed',
+	Pending = 'Pending',
+	Unclaimed = 'Unclaimed',
+	Returned = 'Returned',
+	OnHold = 'OnHold',
+	Blocked = 'Blocked',
+	Refunded = 'Refunded',
+	Reversed = 'Reversed',
 }
 
 @Entity('payment')
@@ -75,6 +79,12 @@ export class PaymentEntity {
 		default: 0,
 	})
 	serviceFee: string;
+
+	@Column({
+		name: 'paypal_payout_id',
+		nullable: true,
+	})
+	paypalPayoutId?: string;
 
 	@ManyToOne(type => UserEntity, user => user.payments, {
 		onDelete: 'CASCADE',

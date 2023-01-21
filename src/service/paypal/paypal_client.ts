@@ -77,15 +77,20 @@ export class PaypalClient {
 
 		const url = new URL(path, this.config.apiUrl);
 
-		const response = await fetch(url, {
+		const options: RequestInit = {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
 				Accept: 'application/json',
 				Authorization: `Bearer ${this.accessToken}`,
 			},
-			body: body && JSON.stringify(body),
-		});
+		};
+
+		if (body) {
+			options['body'] = JSON.stringify(body);
+		}
+
+		const response = await fetch(url, options);
 
 		if (response.status === HttpStatus.UNAUTHORIZED) {
 			this.accessToken = undefined;
@@ -93,7 +98,7 @@ export class PaypalClient {
 		}
 
 		// Not success status code
-		if (response.status.toString().startsWith('2')) {
+		if (!response.status.toString().startsWith('2')) {
 			throw new UnexpectedPaypalResponse();
 		}
 
