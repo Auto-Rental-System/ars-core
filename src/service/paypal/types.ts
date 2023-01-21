@@ -21,6 +21,11 @@ export interface AmountWithCurrencyCode {
 	value: string;
 }
 
+export interface AmountWithCurrency {
+	value: string;
+	currency: string;
+}
+
 export interface AmountWithCurrencyCodeOptional {
 	currency_code?: string;
 	value: string;
@@ -100,4 +105,89 @@ export interface OrderResponse {
 		items?: PurchaseItem[];
 		payments?: Payments;
 	}>;
+}
+
+export interface PayoutItem {
+	amount: AmountWithCurrency;
+	receiver: string;
+	recipient_type: 'EMAIL' | 'PHONE' | 'PAYPAL_ID';
+	alternate_notification_method?: {
+		phone?: {
+			country_code: string;
+			national_number: string;
+			extension_number?: string;
+		};
+	};
+	application_context?: {
+		logo_url?: string;
+		social_feed_privacy?: 'PUBLIC' | 'FRIENDS_ONLY' | 'PRIVATE';
+	};
+	note?: string;
+	notification_language?: string;
+	recipient_wallet?: string;
+	sender_item_id?: string;
+}
+
+export interface SenderBatchHeader {
+	email_message?: string;
+	email_subject?: string;
+	note?: string;
+	recipient_type?: string;
+	sender_batch_id?: string;
+}
+
+export interface CreatePayoutBody {
+	items: Array<PayoutItem>;
+	sender_batch_header: SenderBatchHeader;
+}
+
+export interface CreatePayoutResponse {
+	batch_header: {
+		batch_status: 'DENIED' | 'PENDING' | 'PROCESSING' | 'SUCCESS' | 'CANCELED';
+		payout_batch_id: string;
+		sender_batch_header: SenderBatchHeader;
+		time_created?: string;
+	};
+	links: Array<LinkDescription>;
+}
+
+export interface PayoutBatchHeader {
+	batch_status: 'DENIED' | 'PENDING' | 'PROCESSING' | 'SUCCESS' | 'CANCELED';
+	payout_batch_id: string;
+	sender_batch_header: SenderBatchHeader;
+	amount: AmountWithCurrency;
+	fees: AmountWithCurrency;
+	funding_source: 'BALANCE';
+	time_closed?: string;
+	time_completed?: string;
+	time_created?: string;
+}
+
+export interface PayoutResponse {
+	batch_header: PayoutBatchHeader;
+	items: {
+		payout_batch_id: string;
+		payout_item: any;
+		payout_item_id: string;
+		activity_id?: string;
+		currency_conversion?: any;
+		errors: any;
+		links: Array<LinkDescription>;
+		payout_item_fee: any;
+		time_processed: string;
+		transaction_id: string;
+		transaction_status:
+			| 'SUCCESS'
+			| 'FAILED'
+			| 'PENDING'
+			| 'UNCLAIMED'
+			| 'RETURNED'
+			| 'ONHOLD'
+			| 'BLOCKED'
+			| 'REFUNDED'
+			| 'REVERSED';
+	};
+	links: Array<LinkDescription>;
+	total_items: number;
+	total_pages: number;
 }

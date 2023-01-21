@@ -37,9 +37,10 @@ export class PaymentRepository {
 				rentalOrderId: payment.rentalOrderId,
 				userId: payment.userId,
 				type: payment.type,
-				grossValue: payment.grossValue,
-				paypalFee: payment.paypalFee,
-				serviceFee: payment.serviceFee,
+				status: payment.status,
+				grossValue: payment.grossValue.toString(),
+				paypalFee: payment.paypalFee.toString(),
+				serviceFee: payment.serviceFee.toString(),
 			})
 			.execute();
 
@@ -63,7 +64,8 @@ export class PaymentRepository {
 			return totalPayments;
 		}
 
-		const result: Array<TotalPaymentRaw> = await this.manager.query(`
+		const result: Array<TotalPaymentRaw> = await this.manager.query(
+			`
 			SELECT
 				car_id,
 				SUM(p.gross_value) as gross_value,
@@ -74,7 +76,9 @@ export class PaymentRepository {
 			WHERE p.type = ?
 			AND ro.car_id IN (?)
 			GROUP BY ro.car_id;
-		`, [type, carIds]);
+		`,
+			[type, carIds],
+		);
 
 		result.forEach(raw => {
 			totalPayments.set(raw.car_id, {
@@ -102,9 +106,10 @@ export class PaymentRepository {
 				paymentEntity.rentalOrderId,
 				paymentEntity.userId,
 				paymentEntity.type,
-				paymentEntity.grossValue,
-				paymentEntity.paypalFee,
-				paymentEntity.serviceFee,
+				paymentEntity.status,
+				parseFloat(paymentEntity.grossValue),
+				parseFloat(paymentEntity.paypalFee),
+				parseFloat(paymentEntity.serviceFee),
 				paymentEntity.id,
 			);
 		}

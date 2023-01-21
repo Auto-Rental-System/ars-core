@@ -4,6 +4,7 @@ import { Brackets, EntityManager } from 'typeorm';
 import { RentalOrder } from 'model';
 import { Result } from 'shared/util/util';
 import { RentalOrderEntity } from 'entity/rental_order.entity';
+import { PaymentEntity, PaymentType } from 'entity/payment.entity';
 
 @Injectable()
 export class RentalOrderRepository {
@@ -52,8 +53,8 @@ export class RentalOrderRepository {
 			.insert()
 			.into(RentalOrderEntity)
 			.values({
-				startAt: rentalOrder.startAt,
-				endAt: rentalOrder.endAt,
+				startAt: rentalOrder.startAt.toString(),
+				endAt: rentalOrder.endAt.toString(),
 				userId: rentalOrder.userId,
 				carId: rentalOrder.carId,
 				paypalOrderId: rentalOrder.paypalOrderId,
@@ -63,11 +64,30 @@ export class RentalOrderRepository {
 		return (await this.getById(identifiers[0].id)) as RentalOrder;
 	}
 
+	public async getRentalOrdersToPayout(): Promise<Array<RentalOrder>> {
+		const rentalOrderEntities = await this.manager
+			.createQueryBuilder(RentalOrderEntity, 'rentalOrder')
+			.where(queryBuilder => {
+				const subQuery = queryBuilder
+					.subQuery()
+					.select('payment.rental_order_id')
+					.from(PaymentEntity, 'payment')
+					.where('payment.type = :payout', { payout: PaymentType.Payout })
+					.getQuery();
+
+				return `rentalOrder.id NOT IN ${subQuery}`;
+			})
+			.andWhere(`((rentalOrder.end_at)::date + '1 day'::interval) <= NOW()`)
+			.getMany();
+
+		return rentalOrderEntities.map(entity => this.convertToModel(entity)) as Array<RentalOrder>;
+	}
+
 	public convertToModel(rentalOrderEntity?: RentalOrderEntity): Result<RentalOrder> {
 		if (rentalOrderEntity) {
 			return new RentalOrder(
-				rentalOrderEntity.startAt,
-				rentalOrderEntity.endAt,
+				new Date(rentalOrderEntity.startAt),
+				new Date(rentalOrderEntity.endAt),
 				rentalOrderEntity.userId,
 				rentalOrderEntity.carId,
 				rentalOrderEntity.paypalOrderId,

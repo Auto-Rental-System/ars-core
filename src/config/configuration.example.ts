@@ -41,4 +41,7 @@ export default () => ({
 		// For Live: https://api-m.paypal.com
 		apiUrl: 'https://api-m.paypal.com',
 	},
+	payout: {
+		serviceFeePercentage: 5,
+	},
 });

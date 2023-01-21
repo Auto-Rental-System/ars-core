@@ -43,3 +43,7 @@ export interface PaypalConfig {
 	secret: string;
 	apiUrl: string;
 }
+
+export interface PayoutConfig {
+	serviceFeePercentage: number;
+}

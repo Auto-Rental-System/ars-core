@@ -5,7 +5,7 @@ import { ApplicationError } from 'shared/error';
 import { Car } from 'model';
 import { RentCarRequest } from 'interface/apiRequest';
 import { PaypalClient } from './paypal_client';
-import { OrderResponse } from './types';
+import { CreatePayoutBody, CreatePayoutResponse, OrderResponse, PayoutResponse } from './types';
 
 @Injectable()
 export class PaypalService {
@@ -61,6 +61,14 @@ export class PaypalService {
 		const days = dayjs(body.endAt).diff(dayjs(body.startAt), 'days') + 1;
 		const totalPrice = dayPrice * days;
 		await this.ensureOrderWasPaidProperly(body.orderId, totalPrice);
+	}
+
+	public async createPayout(body: CreatePayoutBody): Promise<CreatePayoutResponse> {
+		return await this.paypalClient.createPayout(body);
+	}
+
+	public async getPayoutByBatchId(payoutBatchId: string): Promise<PayoutResponse> {
+		return await this.paypalClient.getPayoutByBatchId(payoutBatchId);
 	}
 }
 

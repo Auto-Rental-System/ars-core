@@ -16,6 +16,14 @@ export enum PaymentType {
 	Payout = 'Payout',
 }
 
+export enum PaymentStatus {
+	Denied = 'Denied',
+	Pending = 'Pending',
+	Processing = 'Processing',
+	Success = 'Success',
+	Canceled = 'Canceled',
+}
+
 @Entity('payment')
 @Unique(['type', 'rentalOrderId'])
 export class PaymentEntity {
@@ -33,6 +41,12 @@ export class PaymentEntity {
 	})
 	type: PaymentType;
 
+	@Column({
+		type: 'enum',
+		enum: PaymentStatus,
+	})
+	status: PaymentStatus;
+
 	// from -99999.99 to 99999.99
 	@Column({
 		name: 'gross_value',
@@ -40,27 +54,27 @@ export class PaymentEntity {
 		precision: 7,
 		scale: 2,
 	})
-	grossValue: number;
+	grossValue: string;
 
 	// from -9999.99 to 9999.99
 	@Column({
 		name: 'paypal_fee',
-		nullable: true,
 		type: 'numeric',
 		precision: 6,
 		scale: 2,
+		default: 0,
 	})
-	paypalFee?: number;
+	paypalFee: string;
 
 	// from -9999.99 to 9999.99
 	@Column({
 		name: 'service_fee',
-		nullable: true,
 		type: 'numeric',
 		precision: 6,
 		scale: 2,
+		default: 0,
 	})
-	serviceFee?: number;
+	serviceFee: string;
 
 	@ManyToOne(type => UserEntity, user => user.payments, {
 		onDelete: 'CASCADE',
