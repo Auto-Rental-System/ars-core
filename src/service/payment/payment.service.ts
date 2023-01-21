@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { PaymentRepository } from 'repository';
-import {
-	CreatePayoutBody,
-	PayoutItemTransactionStatus,
-	PaypalService,
-} from 'service/paypal';
+import { CreatePayoutBody, PayoutItemTransactionStatus, PaypalService } from 'service/paypal';
 import { Payment, RentalOrder, User } from 'model';
 import { PaymentStatus, PaymentType } from 'entity/payment.entity';
 import { PayoutConfig } from 'config/interfaces';

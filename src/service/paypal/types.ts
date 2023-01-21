@@ -227,3 +227,17 @@ export interface PaypalWebhookBody<T> {
 	summary: string;
 	resource: T;
 }
+
+export interface VerifyWebhookBody {
+	webhook_id: string;
+	auth_algo: string;
+	cert_url: string;
+	transmission_id: string;
+	transmission_sig: string;
+	transmission_time: string;
+	webhook_event: any;
+}
+
+export interface VerifyWebhookResponse {
+	verification_status: 'SUCCESS' | 'FAILURE';
+}

@@ -40,6 +40,7 @@ export default () => ({
 		// For Sandbox: https://api-m.sandbox.paypal.com
 		// For Live: https://api-m.paypal.com
 		apiUrl: 'https://api-m.paypal.com',
+		webhookId: 'your-paypal-webhook-id',
 	},
 	payout: {
 		serviceFeePercentage: 5,

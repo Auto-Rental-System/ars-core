@@ -12,6 +12,8 @@ import {
 	CreatePayoutBody,
 	CreatePayoutResponse,
 	PayoutResponse,
+	VerifyWebhookBody,
+	VerifyWebhookResponse,
 } from './types';
 
 @Injectable()
@@ -21,6 +23,12 @@ export class PaypalClient {
 
 	constructor(private readonly configService: ConfigService) {
 		this.config = configService.get('paypal') as PaypalConfig;
+	}
+
+	public async verifyWebhookSignature(body: VerifyWebhookBody): Promise<VerifyWebhookResponse> {
+		const path = `/v1/notifications/verify-webhook-signature`;
+
+		return await this.request<VerifyWebhookResponse>(path, 'POST', body);
 	}
 
 	public async getPayment(captureId: string): Promise<Capture> {
