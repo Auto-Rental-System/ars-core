@@ -3,24 +3,17 @@ import { Injectable } from '@nestjs/common';
 import { Car, RentalOrder, User } from 'model';
 import { RentCarRequest } from 'interface/apiRequest';
 import { ApplicationError } from 'shared/error';
-import { PaymentService } from 'service/payment';
 import { RentalOrderRepository } from 'repository';
 
 @Injectable()
 export class CarRentalService {
-	constructor(
-		private readonly rentalOrderRepository: RentalOrderRepository,
-		private readonly paymentService: PaymentService,
-	) {}
+	constructor(private readonly rentalOrderRepository: RentalOrderRepository) {}
 
-	public async rent(car: Car, body: RentCarRequest, user: User): Promise<Array<RentalOrder>> {
+	public async rent(car: Car, body: RentCarRequest, user: User): Promise<RentalOrder> {
 		let rentalOrder = new RentalOrder(body.startAt, body.endAt, user.id, car.id, body.orderId);
-
 		rentalOrder = await this.rentalOrderRepository.insert(rentalOrder);
 
-		await this.paymentService.createCheckoutPayment(body.orderId, rentalOrder);
-
-		return await this.getCarRentalOrders(car);
+		return rentalOrder;
 	}
 
 	public async ensureNoRentalOrdersByPaypalOrderId(paypalOrderId): Promise<void> {

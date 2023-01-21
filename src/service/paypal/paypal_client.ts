@@ -93,7 +93,7 @@ export class PaypalClient {
 		}
 
 		// Not success status code
-		if (response.status < 200 || response.status >= 300) {
+		if (response.status.toString().startsWith('2')) {
 			throw new UnexpectedPaypalResponse();
 		}
 

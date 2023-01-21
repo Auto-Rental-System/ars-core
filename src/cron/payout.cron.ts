@@ -16,7 +16,7 @@ export class PayoutCron {
 	) {}
 
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, { name: 'payout_cron' })
-	public async handleInterval() {
+	public async payoutCron() {
 		const rentalOrders = await this.carRentalService.getRentalOrdersToPayout();
 
 		await Promise.all(
