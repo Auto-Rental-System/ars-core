@@ -72,7 +72,7 @@ export class PaymentService {
 		return this.paymentRepository.insert(payment);
 	}
 
-	public projectPayoutItemStatus(transactionStatus: PayoutItemTransactionStatus): PaymentStatus {
+	public projectPayoutItemTransactionStatus(transactionStatus: PayoutItemTransactionStatus): PaymentStatus {
 		const projection: Record<PayoutItemTransactionStatus, PaymentStatus> = {
 			SUCCESS: PaymentStatus.Success,
 			FAILED: PaymentStatus.Failed,
@@ -124,7 +124,7 @@ export class PaymentService {
 			rentalOrder.id,
 			landlord.id,
 			PaymentType.Payout,
-			this.projectPayoutItemStatus(payoutItem.transaction_status),
+			this.projectPayoutItemTransactionStatus(payoutItem.transaction_status),
 			parseFloat(payoutItem.payout_item.amount.value),
 			parseFloat(payoutItem.payout_item_fee.value),
 			serviceFee,

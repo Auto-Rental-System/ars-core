@@ -22,7 +22,7 @@ export class PaypalWebhookHandler {
 
 				const payment = await this.paymentService.getByPaypalPayoutId(body.resource.payout_item_id);
 
-				const status = this.paymentService.projectPayoutItemStatus(body.resource.transaction_status);
+				const status = this.paymentService.projectPayoutItemTransactionStatus(body.resource.transaction_status);
 				await this.paymentService.setPaymentStatus(payment, status);
 
 				break;

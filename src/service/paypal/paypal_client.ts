@@ -85,20 +85,15 @@ export class PaypalClient {
 
 		const url = new URL(path, this.config.apiUrl);
 
-		const options: RequestInit = {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
 				Accept: 'application/json',
 				Authorization: `Bearer ${this.accessToken}`,
 			},
-		};
-
-		if (body) {
-			options['body'] = JSON.stringify(body);
-		}
-
-		const response = await fetch(url, options);
+			body: body && JSON.stringify(body),
+		});
 
 		if (response.status === HttpStatus.UNAUTHORIZED) {
 			this.accessToken = undefined;
