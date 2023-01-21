@@ -1,5 +1,5 @@
 import { PaymentStatus, PaymentType } from 'entity/payment.entity';
-import { NEW_ID } from 'shared/util/util';
+import { NEW_ID, toDoublePrecisionFloat } from 'shared/util/util';
 
 export class Payment {
 	constructor(
@@ -18,6 +18,7 @@ export class Payment {
 	) {}
 
 	public get netValue() {
-		return this.grossValue - this.paypalFee - this.serviceFee;
+		const value = this.grossValue - this.paypalFee - this.serviceFee;
+		return toDoublePrecisionFloat(value)
 	}
 }

@@ -6,7 +6,7 @@ import { CreatePayoutBody, PayoutItemTransactionStatus, PaypalService } from 'se
 import { Payment, RentalOrder, User } from 'model';
 import { PaymentStatus, PaymentType } from 'entity/payment.entity';
 import { PayoutConfig } from 'config/interfaces';
-import { Result } from 'shared/util/util';
+import { Result, toDoublePrecisionFloat } from 'shared/util/util';
 import { ApplicationError } from 'shared/error';
 
 @Injectable()
@@ -94,7 +94,8 @@ export class PaymentService {
 		landlord: User,
 	): Promise<Payment> {
 		const serviceFee = (checkoutPayment.netValue * this.payoutConfig.serviceFeePercentage) / 100;
-		const payoutValue = checkoutPayment.netValue - serviceFee;
+		let payoutValue = checkoutPayment.netValue - serviceFee;
+		payoutValue = toDoublePrecisionFloat(payoutValue);
 
 		const body: CreatePayoutBody = {
 			sender_batch_header: {
