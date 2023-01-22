@@ -12,6 +12,10 @@ export enum CarOrderBy {
 	EngineCapacity = 'car.engine_capacity',
 }
 
+export enum OwnCarOrderBy {
+	CarId = 'car.id',
+}
+
 export class RegisterUserRequest {
 	@ApiProperty()
 	firstName: string;

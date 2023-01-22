@@ -7,15 +7,15 @@ import { PaymentEntity, PaymentStatus, PaymentType } from 'entity/payment.entity
 
 export interface TotalPayment {
 	grossValue: number;
-	paypalFee?: number;
-	serviceFee?: number;
+	paypalFee: number;
+	serviceFee: number;
 }
 
 export interface TotalPaymentRaw {
 	car_id: number;
 	gross_value: number;
-	paypal_fee?: number;
-	service_fee?: number;
+	paypal_fee: number;
+	service_fee: number;
 }
 
 @Injectable()
@@ -73,7 +73,7 @@ export class PaymentRepository {
 	}
 
 	//carId, TotalPayment
-	public async getCarPayments(carIds: Array<number>, type: PaymentType): Promise<Map<number, TotalPayment>> {
+	public async getCarsTotalPayments(carIds: Array<number>, type: PaymentType): Promise<Map<number, TotalPayment>> {
 		const totalPayments = new Map<number, TotalPayment>();
 
 		if (!carIds.length) {

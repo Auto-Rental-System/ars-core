@@ -4,7 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { Result } from 'shared/util/util';
 import { Car } from 'model';
 import { CarEntity } from 'entity/car.entity';
-import { CarPaginationRequest } from 'value_object/pagination_request/car_pagination_request';
+import { CarPaginationRequest, OwnCarPaginationRequest } from 'value_object/pagination_request';
+import { applyFilters, applyPaginationParams, ListWithTotal } from 'shared/util/typeorm';
 
 @Injectable()
 export class CarRepository {
@@ -59,28 +60,33 @@ export class CarRepository {
 		return (await this.getById(car.id)) as Car;
 	}
 
-	public async getAllCars(paginationRequest: CarPaginationRequest): Promise<{ list: Array<Car>; total: number }> {
+	public async getAllCars(paginationRequest: CarPaginationRequest): Promise<ListWithTotal<Car>> {
 		let carEntitiesQuery = this.manager.createQueryBuilder(CarEntity, 'car');
-
-		carEntitiesQuery = paginationRequest.filters.reduce((query, filter, i) => {
-			return i === 0
-				? query.where(`${filter.key} = :value`, { value: filter.value })
-				: query.andWhere(`${filter.key} = :value`, { value: filter.value });
-		}, carEntitiesQuery);
+		carEntitiesQuery = applyFilters(carEntitiesQuery, paginationRequest.filters);
 
 		const total = await carEntitiesQuery.getCount();
 
-		if (paginationRequest.orderBy) {
-			carEntitiesQuery = carEntitiesQuery.orderBy(paginationRequest.orderBy, paginationRequest.order);
-		}
-
-		const carEntities = await carEntitiesQuery
-			.limit(paginationRequest.rowsPerPage)
-			.offset((paginationRequest.page - 1) * paginationRequest.rowsPerPage)
-			.getMany();
+		carEntitiesQuery = applyPaginationParams(carEntitiesQuery, paginationRequest);
+		const carEntities = await carEntitiesQuery.getMany();
 
 		return {
-			list: carEntities.map(this.convertToModel) as Array<Car>,
+			list: carEntities.map(carEntity => this.convertToModel(carEntity)) as Array<Car>,
+			total,
+		};
+	}
+
+	public async getOwnCars(paginationRequest: OwnCarPaginationRequest, userId: number): Promise<ListWithTotal<Car>> {
+		let carEntitiesQuery = this.manager.createQueryBuilder(CarEntity, 'car');
+		carEntitiesQuery = applyFilters(carEntitiesQuery, paginationRequest.filters);
+		carEntitiesQuery = carEntitiesQuery.andWhere('car.user_id = :userId', { userId });
+
+		const total = await carEntitiesQuery.getCount();
+
+		carEntitiesQuery = applyPaginationParams(carEntitiesQuery, paginationRequest);
+		const carEntities = await carEntitiesQuery.getMany();
+
+		return {
+			list: carEntities.map(carEntity => this.convertToModel(carEntity)) as Array<Car>,
 			total,
 		};
 	}

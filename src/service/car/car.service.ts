@@ -11,6 +11,7 @@ import { CarPaginationRequest } from 'value_object/pagination_request/car_pagina
 import { StorageService, SignedPostUrlResponse } from 'service/storage';
 import { CarConfig } from 'config/interfaces';
 import { Result } from 'shared/util/util';
+import { OwnCarPaginationRequest } from 'value_object/pagination_request';
 
 @Injectable()
 export class CarService {
@@ -165,6 +166,12 @@ export class CarService {
 			result.total,
 			result.list,
 		);
+	}
+
+	public async getOwnCars(paginationRequest: OwnCarPaginationRequest, user: User): Promise<PaginationResponse<Car>> {
+		const result = await this.carRepository.getOwnCars(paginationRequest, user.id);
+
+		return new PaginationResponse(paginationRequest.page, paginationRequest.rowsPerPage, result.total, result.list);
 	}
 
 	public getS3FolderKey(car: Car): string {

@@ -101,6 +101,25 @@ export class CarListResponse {
 	total: number;
 }
 
+export class OwnCarListItemResponse extends CarResponse {
+	@ApiProperty()
+	netValue: number;
+}
+
+export class OwnCarListResponse {
+	@ApiProperty({ isArray: true, type: OwnCarListItemResponse })
+	list: Array<OwnCarListItemResponse>;
+
+	@ApiProperty()
+	page: number;
+
+	@ApiProperty()
+	rowsPerPage: number;
+
+	@ApiProperty()
+	total: number;
+}
+
 export class ImageSignedPostUrlResponse {
 	@ApiProperty()
 	filename: string;

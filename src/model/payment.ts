@@ -19,6 +19,6 @@ export class Payment {
 
 	public get netValue() {
 		const value = this.grossValue - this.paypalFee - this.serviceFee;
-		return toDoublePrecisionFloat(value)
+		return toDoublePrecisionFloat(value);
 	}
 }
