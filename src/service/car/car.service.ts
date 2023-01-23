@@ -36,6 +36,10 @@ export class CarService {
 		return car;
 	}
 
+	public async getByIds(ids: Array<number>): Promise<Array<Car>> {
+		return await this.carRepository.getByIds(ids);
+	}
+
 	public async create(body: CreateCarRequest, user: User): Promise<Car> {
 		let car = new Car(
 			body.brand,
@@ -171,7 +175,12 @@ export class CarService {
 	public async getOwnCars(paginationRequest: OwnCarPaginationRequest, user: User): Promise<PaginationResponse<Car>> {
 		const result = await this.carRepository.getOwnCars(paginationRequest, user.id);
 
-		return new PaginationResponse(paginationRequest.page, paginationRequest.rowsPerPage, result.total, result.list);
+		return new PaginationResponse<Car>(
+			paginationRequest.page,
+			paginationRequest.rowsPerPage,
+			result.total,
+			result.list,
+		);
 	}
 
 	public getS3FolderKey(car: Car): string {

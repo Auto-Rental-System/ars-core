@@ -48,6 +48,15 @@ export class PaymentRepository {
 		return (await this.getById(identifiers[0].id)) as Payment;
 	}
 
+	public async getByOrderIdsAndType(ids: Array<number>, type: PaymentType): Promise<Array<Payment>> {
+		const paymentEntities = await this.manager
+			.createQueryBuilder(PaymentEntity, 'payment')
+			.where({ id: In(ids), type })
+			.getMany();
+
+		return paymentEntities.map(paymentEntity => this.convertToModel(paymentEntity)) as Array<Payment>;
+	}
+
 	public async getByRentalOrderIdAndType(rentalOrderId: number, type: PaymentType): Promise<Result<Payment>> {
 		const paymentEntity = await this.manager
 			.createQueryBuilder(PaymentEntity, 'payment')

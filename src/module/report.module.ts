@@ -6,7 +6,8 @@ import { PaymentService } from 'service/payment';
 import { ReportFormatter } from 'service/report';
 import { StorageService } from 'service/storage';
 import { PaypalClient, PaypalService } from 'service/paypal';
-import { CarImageRepository, CarRepository, PaymentRepository } from 'repository';
+import { RentalService } from 'service/rental';
+import { CarImageRepository, CarRepository, PaymentRepository, RentalOrderRepository } from 'repository';
 
 @Module({
 	controllers: [
@@ -20,6 +21,8 @@ import { CarImageRepository, CarRepository, PaymentRepository } from 'repository
 		PaymentRepository,
 		PaypalService,
 		PaypalClient,
+		RentalService,
+		RentalOrderRepository,
 	],
 })
 export class ReportModule {}

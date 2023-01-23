@@ -36,11 +36,12 @@ export class CarFormatter {
 		};
 	}
 
-	private toRentalOrder(order: RentalOrder, user: User): RentalOrderResponse {
+	public toRentalOrderResponse(order: RentalOrder): RentalOrderResponse {
 		return {
 			startAt: order.startAt,
 			endAt: order.endAt,
-			orderedByMe: order.userId === user.id,
+			id: order.id,
+			carId: order.carId,
 		};
 	}
 
@@ -48,11 +49,10 @@ export class CarFormatter {
 		car: Car,
 		rentalOrders: Array<RentalOrder>,
 		carImages: Array<CarImage>,
-		user: User,
 	): DetailedCarResponse {
 		return {
 			...this.toCarResponse(car),
-			rentalOrders: rentalOrders.map(order => this.toRentalOrder(order, user)),
+			rentalOrders: rentalOrders.map(order => this.toRentalOrderResponse(order)),
 			images: carImages.map(image => this.toCarImageResponse(image)),
 		};
 	}

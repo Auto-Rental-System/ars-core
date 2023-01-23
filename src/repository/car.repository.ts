@@ -1,4 +1,4 @@
-import { EntityManager } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
 import { Result } from 'shared/util/util';
@@ -15,6 +15,15 @@ export class CarRepository {
 		const carEntity = await this.manager.createQueryBuilder(CarEntity, 'car').where({ id }).getOne();
 
 		return this.convertToModel(carEntity);
+	}
+
+	public async getByIds(ids: Array<number>): Promise<Array<Car>> {
+		const carEntities = await this.manager
+			.createQueryBuilder(CarEntity, 'car')
+			.where({ id: In(ids) })
+			.getMany();
+
+		return carEntities.map(carEntity => this.convertToModel(carEntity)) as Array<Car>;
 	}
 
 	public async insert(car: Car): Promise<Car> {

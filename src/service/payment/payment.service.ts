@@ -42,6 +42,11 @@ export class PaymentService {
 		return payment;
 	}
 
+	public async getByOrdersAndType(orders: Array<RentalOrder>, type: PaymentType): Promise<Array<Payment>> {
+		const orderIds = orders.map(order => order.id);
+		return await this.paymentRepository.getByOrderIdsAndType(orderIds, type);
+	}
+
 	public async getByRentalOrderAndType(order: RentalOrder, type: PaymentType): Promise<Result<Payment>> {
 		return await this.paymentRepository.getByRentalOrderIdAndType(order.id, type);
 	}
