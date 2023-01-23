@@ -6,7 +6,7 @@ import { ApplicationError } from 'shared/error';
 import { RentalOrderRepository } from 'repository';
 
 @Injectable()
-export class CarRentalService {
+export class RentalService {
 	constructor(private readonly rentalOrderRepository: RentalOrderRepository) {}
 
 	public async rent(car: Car, body: RentCarRequest, user: User): Promise<RentalOrder> {

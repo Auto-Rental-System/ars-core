@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 
 import { CarController } from 'controller';
-import { CarService, CarRentalService, CarFormatter } from 'service/car';
+import { CarService, CarFormatter } from 'service/car';
+import { RentalService } from 'service/rental';
 import { StorageService } from 'service/storage';
 import { PaypalService, PaypalClient } from 'service/paypal';
 import { PaymentService } from 'service/payment';
@@ -13,7 +14,7 @@ import { AuthModule } from './auth.module';
 	controllers: [CarController],
 	providers: [
 		CarService,
-		CarRentalService,
+		RentalService,
 		CarFormatter,
 		CarRepository,
 		RentalOrderRepository,

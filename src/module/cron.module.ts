@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 
 import { PayoutCron } from 'cron/payout.cron';
-import { CarRentalService, CarService } from 'service/car';
+import { CarService } from 'service/car';
+import { RentalService } from 'service/rental';
 import { UserService } from 'service/user';
 import { PaymentService } from 'service/payment';
 import { PaypalClient, PaypalService } from 'service/paypal';
@@ -18,7 +19,7 @@ import {
 @Module({
 	providers: [
 		PayoutCron,
-		CarRentalService,
+		RentalService,
 		CarService,
 		UserService,
 		PaymentService,
