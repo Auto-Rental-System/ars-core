@@ -5,6 +5,8 @@ import { RentalOrder } from 'model';
 import { Result } from 'shared/util/util';
 import { RentalOrderEntity } from 'entity/rental_order.entity';
 import { PaymentEntity, PaymentType } from 'entity/payment.entity';
+import { OrderPaginationRequest } from 'value_object/pagination_request';
+import { applyFilters, applyPaginationParams, ListWithTotal } from 'shared/util/typeorm';
 
 @Injectable()
 export class RentalOrderRepository {
@@ -81,6 +83,25 @@ export class RentalOrderRepository {
 			.getMany();
 
 		return rentalOrderEntities.map(entity => this.convertToModel(entity)) as Array<RentalOrder>;
+	}
+
+	public async getOrders(
+		paginationRequest: OrderPaginationRequest,
+		userId: number,
+	): Promise<ListWithTotal<RentalOrder>> {
+		let rentalOrderEntitiesQuery = this.manager.createQueryBuilder(RentalOrderEntity, 'rentalOrder');
+		rentalOrderEntitiesQuery = applyFilters(rentalOrderEntitiesQuery, paginationRequest.filters);
+		rentalOrderEntitiesQuery = rentalOrderEntitiesQuery.andWhere('rentalOrder.user_id = :userId', { userId });
+
+		const total = await rentalOrderEntitiesQuery.getCount();
+
+		rentalOrderEntitiesQuery = applyPaginationParams(rentalOrderEntitiesQuery, paginationRequest);
+		const rentalOrderEntities = await rentalOrderEntitiesQuery.getMany();
+
+		return {
+			list: rentalOrderEntities.map(entity => this.convertToModel(entity)) as Array<RentalOrder>,
+			total,
+		};
 	}
 
 	public convertToModel(rentalOrderEntity?: RentalOrderEntity): Result<RentalOrder> {

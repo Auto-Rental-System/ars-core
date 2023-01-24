@@ -4,9 +4,11 @@ import { Car, RentalOrder, User } from 'model';
 import { RentCarRequest } from 'interface/apiRequest';
 import { ApplicationError } from 'shared/error';
 import { RentalOrderRepository } from 'repository';
+import { OrderPaginationRequest } from 'value_object/pagination_request';
+import { PaginationResponse } from 'value_object';
 
 @Injectable()
-export class CarRentalService {
+export class RentalService {
 	constructor(private readonly rentalOrderRepository: RentalOrderRepository) {}
 
 	public async rent(car: Car, body: RentCarRequest, user: User): Promise<RentalOrder> {
@@ -41,6 +43,20 @@ export class CarRentalService {
 
 	public async getRentalOrdersToPayout(): Promise<Array<RentalOrder>> {
 		return await this.rentalOrderRepository.getRentalOrdersToPayout();
+	}
+
+	public async getOrders(
+		paginationRequest: OrderPaginationRequest,
+		user: User,
+	): Promise<PaginationResponse<RentalOrder>> {
+		const result = await this.rentalOrderRepository.getOrders(paginationRequest, user.id);
+
+		return new PaginationResponse<RentalOrder>(
+			paginationRequest.page,
+			paginationRequest.rowsPerPage,
+			result.total,
+			result.list,
+		);
 	}
 }
 

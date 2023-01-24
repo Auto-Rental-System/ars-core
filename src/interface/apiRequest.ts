@@ -7,9 +7,17 @@ export enum Order {
 	Desc = 'DESC',
 }
 
-export enum CarOrderBy {
+export enum CarListOrderBy {
 	Price = 'car.price',
 	EngineCapacity = 'car.engine_capacity',
+}
+
+export enum OwnCarListOrderBy {
+	CarId = 'car.id',
+}
+
+export enum OrderListOrderBy {
+	OrderId = 'order.id',
 }
 
 export class RegisterUserRequest {

@@ -7,15 +7,15 @@ import { PaymentEntity, PaymentStatus, PaymentType } from 'entity/payment.entity
 
 export interface TotalPayment {
 	grossValue: number;
-	paypalFee?: number;
-	serviceFee?: number;
+	paypalFee: number;
+	serviceFee: number;
 }
 
 export interface TotalPaymentRaw {
 	car_id: number;
 	gross_value: number;
-	paypal_fee?: number;
-	service_fee?: number;
+	paypal_fee: number;
+	service_fee: number;
 }
 
 @Injectable()
@@ -48,6 +48,15 @@ export class PaymentRepository {
 		return (await this.getById(identifiers[0].id)) as Payment;
 	}
 
+	public async getByOrderIdsAndType(ids: Array<number>, type: PaymentType): Promise<Array<Payment>> {
+		const paymentEntities = await this.manager
+			.createQueryBuilder(PaymentEntity, 'payment')
+			.where({ id: In(ids), type })
+			.getMany();
+
+		return paymentEntities.map(paymentEntity => this.convertToModel(paymentEntity)) as Array<Payment>;
+	}
+
 	public async getByRentalOrderIdAndType(rentalOrderId: number, type: PaymentType): Promise<Result<Payment>> {
 		const paymentEntity = await this.manager
 			.createQueryBuilder(PaymentEntity, 'payment')
@@ -73,7 +82,7 @@ export class PaymentRepository {
 	}
 
 	//carId, TotalPayment
-	public async getCarPayments(carIds: Array<number>, type: PaymentType): Promise<Map<number, TotalPayment>> {
+	public async getCarsTotalPayments(carIds: Array<number>, type: PaymentType): Promise<Map<number, TotalPayment>> {
 		const totalPayments = new Map<number, TotalPayment>();
 
 		if (!carIds.length) {

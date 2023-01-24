@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { CarRentalService, CarService } from 'service/car';
+import { CarService } from 'service/car';
+import { RentalService } from 'service/rental';
 import { UserService } from 'service/user';
 import { PaymentService } from 'service/payment';
 import { PaymentType } from 'entity/payment.entity';
@@ -9,7 +10,7 @@ import { PaymentType } from 'entity/payment.entity';
 @Injectable()
 export class PayoutCron {
 	constructor(
-		private readonly carRentalService: CarRentalService,
+		private readonly rentalService: RentalService,
 		private readonly carService: CarService,
 		private readonly userService: UserService,
 		private readonly paymentService: PaymentService,
@@ -17,7 +18,7 @@ export class PayoutCron {
 
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, { name: 'payout_cron' })
 	public async payoutCron() {
-		const rentalOrders = await this.carRentalService.getRentalOrdersToPayout();
+		const rentalOrders = await this.rentalService.getRentalOrdersToPayout();
 
 		await Promise.all(
 			rentalOrders.map(async order => {

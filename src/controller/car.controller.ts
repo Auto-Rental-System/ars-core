@@ -9,9 +9,10 @@ import {
 	CarResponse,
 	DetailedCarResponse,
 } from 'interface/apiResponse';
-import { CarOrderBy, CreateCarRequest, Order, RentCarRequest, UpdateCarRequest } from 'interface/apiRequest';
+import { CarListOrderBy, CreateCarRequest, Order, RentCarRequest, UpdateCarRequest } from 'interface/apiRequest';
 import { Request } from 'shared/request';
-import { CarFormatter, CarRentalService, CarService } from 'service/car';
+import { CarFormatter, CarService } from 'service/car';
+import { RentalService } from 'service/rental';
 import { PaypalService } from 'service/paypal';
 import { PaymentService } from 'service/payment';
 import { CarPaginationRequest } from 'value_object/pagination_request/car_pagination_request';
@@ -22,7 +23,7 @@ export class CarController {
 	constructor(
 		private readonly carService: CarService,
 		private readonly carFormatter: CarFormatter,
-		private readonly carRentalService: CarRentalService,
+		private readonly rentalService: RentalService,
 		private readonly paypalService: PaypalService,
 		private readonly paymentService: PaymentService,
 	) {}
@@ -55,14 +56,14 @@ export class CarController {
 	@ApiQuery({ name: 'page', type: Number })
 	@ApiQuery({ name: 'rowsPerPage', type: Number })
 	@ApiQuery({ name: 'order', enum: Order, required: false, enumName: 'Order' })
-	@ApiQuery({ name: 'orderBy', enum: CarOrderBy, required: false, enumName: 'CarOrderBy', type: String })
+	@ApiQuery({ name: 'orderBy', enum: CarListOrderBy, required: false, enumName: 'CarListOrderBy', type: String })
 	@ApiQuery({ name: 'filters', isArray: true, type: String, required: false })
 	@ApiResponse({ status: HttpStatus.OK, type: CarListResponse })
 	public async getAllCars(
 		@Query('page', ParseIntPipe) page: number,
 		@Query('rowsPerPage', ParseIntPipe) rowsPerPage: number,
 		@Query('order') order: Order = Order.Asc,
-		@Query('orderBy') orderBy: CarOrderBy = CarOrderBy.Price,
+		@Query('orderBy') orderBy: CarListOrderBy = CarListOrderBy.Price,
 		@Query('filters') filters: string | Array<string> = [],
 	): Promise<CarListResponse> {
 		const paginationRequest = new CarPaginationRequest(
@@ -92,16 +93,13 @@ export class CarController {
 	@Auth()
 	@ApiParam({ name: 'id', required: true, type: Number })
 	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
-	public async getById(
-		@Req() { user }: Request,
-		@Param('id', new ParseIntPipe()) id: number,
-	): Promise<DetailedCarResponse> {
+	public async getById(@Param('id', new ParseIntPipe()) id: number): Promise<DetailedCarResponse> {
 		const car = await this.carService.getById(id);
-		const rentalOrders = await this.carRentalService.getCarRentalOrders(car);
+		const rentalOrders = await this.rentalService.getCarRentalOrders(car);
 
 		const carImages = await this.carService.getCarImages(car, true);
 
-		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages, user);
+		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages);
 	}
 
 	@Put('/:id')
@@ -109,7 +107,6 @@ export class CarController {
 	@ApiParam({ name: 'id', required: true, type: Number })
 	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
 	public async update(
-		@Req() { user }: Request,
 		@Param('id', ParseIntPipe) id: number,
 		@Body() body: UpdateCarRequest,
 	): Promise<DetailedCarResponse> {
@@ -117,9 +114,9 @@ export class CarController {
 
 		car = await this.carService.updateCar(car, body);
 		const carImages = await this.carService.updateCarImages(car, body.images);
-		const rentalOrders = await this.carRentalService.getCarRentalOrders(car);
+		const rentalOrders = await this.rentalService.getCarRentalOrders(car);
 
-		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages, user);
+		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages);
 	}
 
 	@Post('/:id/order')
@@ -134,16 +131,16 @@ export class CarController {
 		const car = await this.carService.getById(id);
 
 		await this.paypalService.ensureCarRentalWasPaid(car, body);
-		await this.carRentalService.ensureNoRentalOrdersByPaypalOrderId(body.orderId);
-		await this.carRentalService.ensureNoCarRentalPeriodsIntercepts(car, body);
+		await this.rentalService.ensureNoRentalOrdersByPaypalOrderId(body.orderId);
+		await this.rentalService.ensureNoCarRentalPeriodsIntercepts(car, body);
 
-		const rentalOrder = await this.carRentalService.rent(car, body, user);
+		const rentalOrder = await this.rentalService.rent(car, body, user);
 
 		await this.paymentService.createCheckoutPayment(body.orderId, rentalOrder);
 
-		const rentalOrders = await this.carRentalService.getCarRentalOrders(car);
+		const rentalOrders = await this.rentalService.getCarRentalOrders(car);
 		const carImages = await this.carService.getCarImages(car, true);
 
-		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages, user);
+		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages);
 	}
 }

@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { PaymentRepository } from 'repository';
 import { CreatePayoutBody, PayoutItemTransactionStatus, PaypalService } from 'service/paypal';
-import { Payment, RentalOrder, User } from 'model';
+import { Car, Payment, RentalOrder, User } from 'model';
 import { PaymentStatus, PaymentType } from 'entity/payment.entity';
 import { PayoutConfig } from 'config/interfaces';
 import { Result, toDoublePrecisionFloat } from 'shared/util/util';
 import { ApplicationError } from 'shared/error';
+import { PaymentRepository } from 'repository';
+import { TotalPayment } from 'repository/payment_repository';
 
 @Injectable()
 export class PaymentService {
@@ -39,6 +40,11 @@ export class PaymentService {
 		}
 
 		return payment;
+	}
+
+	public async getByOrdersAndType(orders: Array<RentalOrder>, type: PaymentType): Promise<Array<Payment>> {
+		const orderIds = orders.map(order => order.id);
+		return await this.paymentRepository.getByOrderIdsAndType(orderIds, type);
 	}
 
 	public async getByRentalOrderAndType(order: RentalOrder, type: PaymentType): Promise<Result<Payment>> {
@@ -134,6 +140,11 @@ export class PaymentService {
 		payoutPayment = await this.paymentRepository.insert(payoutPayment);
 
 		return payoutPayment;
+	}
+
+	public async getCarsTotalPayments(cars: Array<Car>, type: PaymentType): Promise<Map<number, TotalPayment>> {
+		const carIds = cars.map(car => car.id);
+		return this.paymentRepository.getCarsTotalPayments(carIds, type);
 	}
 }
 

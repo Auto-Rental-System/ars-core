@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from 'entity/user.entity';
 import { Fuel, Gearbox } from 'entity/car.entity';
-import { CarOrderBy, Order } from './apiRequest';
+import { PaymentStatus, PaymentType } from 'entity/payment.entity';
+import { CarListOrderBy, Order } from './apiRequest';
 
 export class UserResponse {
 	@ApiProperty()
@@ -52,15 +53,41 @@ export class CarResponse {
 	price: number;
 }
 
+export class PaymentResponse {
+	@ApiProperty({ type: Number })
+	userId: number;
+
+	@ApiProperty({ enum: PaymentType, enumName: 'PaymentType' })
+	type: PaymentType;
+
+	@ApiProperty({ enum: PaymentStatus, enumName: 'PaymentStatus' })
+	status: PaymentStatus;
+
+	@ApiProperty({ type: Number })
+	grossValue: number;
+
+	@ApiProperty({ type: Number })
+	netValue: number;
+
+	@ApiProperty({ type: Number })
+	paypalFee: number;
+
+	@ApiProperty({ type: Number })
+	serviceFee: number;
+}
+
 export class RentalOrderResponse {
+	@ApiProperty({ type: Number })
+	id: number;
+
 	@ApiProperty({ type: Date })
 	startAt: Date;
 
 	@ApiProperty({ type: Date })
 	endAt: Date;
 
-	@ApiProperty({ type: Boolean })
-	orderedByMe: boolean;
+	@ApiProperty({ type: Number })
+	carId: number;
 }
 
 export class CarImageResponse {
@@ -101,6 +128,50 @@ export class CarListResponse {
 	total: number;
 }
 
+export class OwnCarListItemResponse extends CarResponse {
+	@ApiProperty()
+	netValue: number;
+}
+
+export class OwnCarListResponse {
+	@ApiProperty({ isArray: true, type: OwnCarListItemResponse })
+	list: Array<OwnCarListItemResponse>;
+
+	@ApiProperty()
+	page: number;
+
+	@ApiProperty()
+	rowsPerPage: number;
+
+	@ApiProperty()
+	total: number;
+}
+
+export class OrderListItemResponse {
+	@ApiProperty({ type: CarResponse })
+	car: CarResponse;
+
+	@ApiProperty({ type: RentalOrderResponse })
+	order: RentalOrderResponse;
+
+	@ApiProperty({ type: PaymentResponse })
+	payment: PaymentResponse;
+}
+
+export class OrderListResponse {
+	@ApiProperty({ isArray: true, type: OrderListItemResponse })
+	list: Array<OrderListItemResponse>;
+
+	@ApiProperty()
+	page: number;
+
+	@ApiProperty()
+	rowsPerPage: number;
+
+	@ApiProperty()
+	total: number;
+}
+
 export class ImageSignedPostUrlResponse {
 	@ApiProperty()
 	filename: string;
@@ -118,8 +189,8 @@ export class CarImagesSignedPostUrlResponse {
 }
 
 export class DevInfoResponse {
-	@ApiProperty({ enum: CarOrderBy, enumName: 'CarOrderBy' })
-	carOrderBy?: CarOrderBy;
+	@ApiProperty({ enum: CarListOrderBy, enumName: 'CarOrderBy' })
+	carOrderBy?: CarListOrderBy;
 
 	@ApiProperty({ enum: Order, enumName: 'Order' })
 	order?: Order;

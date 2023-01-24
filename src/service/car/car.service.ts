@@ -11,6 +11,7 @@ import { CarPaginationRequest } from 'value_object/pagination_request/car_pagina
 import { StorageService, SignedPostUrlResponse } from 'service/storage';
 import { CarConfig } from 'config/interfaces';
 import { Result } from 'shared/util/util';
+import { OwnCarPaginationRequest } from 'value_object/pagination_request';
 
 @Injectable()
 export class CarService {
@@ -33,6 +34,10 @@ export class CarService {
 		}
 
 		return car;
+	}
+
+	public async getByIds(ids: Array<number>): Promise<Array<Car>> {
+		return await this.carRepository.getByIds(ids);
 	}
 
 	public async create(body: CreateCarRequest, user: User): Promise<Car> {
@@ -158,6 +163,17 @@ export class CarService {
 
 	public async getAllCars(paginationRequest: CarPaginationRequest): Promise<PaginationResponse<Car>> {
 		const result = await this.carRepository.getAllCars(paginationRequest);
+
+		return new PaginationResponse<Car>(
+			paginationRequest.page,
+			paginationRequest.rowsPerPage,
+			result.total,
+			result.list,
+		);
+	}
+
+	public async getOwnCars(paginationRequest: OwnCarPaginationRequest, user: User): Promise<PaginationResponse<Car>> {
+		const result = await this.carRepository.getOwnCars(paginationRequest, user.id);
 
 		return new PaginationResponse<Car>(
 			paginationRequest.page,
