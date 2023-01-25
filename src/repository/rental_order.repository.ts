@@ -7,6 +7,7 @@ import { RentalOrderEntity } from 'entity/rental_order.entity';
 import { PaymentEntity, PaymentType } from 'entity/payment.entity';
 import { OrderPaginationRequest } from 'value_object/pagination_request';
 import { applyFilters, applyPaginationParams, ListWithTotal } from 'shared/util/typeorm';
+import { UserRole } from 'entity/user.entity';
 
 @Injectable()
 export class RentalOrderRepository {
@@ -88,10 +89,18 @@ export class RentalOrderRepository {
 	public async getOrders(
 		paginationRequest: OrderPaginationRequest,
 		userId: number,
+		userRole: UserRole,
 	): Promise<ListWithTotal<RentalOrder>> {
-		let rentalOrderEntitiesQuery = this.manager.createQueryBuilder(RentalOrderEntity, 'rentalOrder');
+		let rentalOrderEntitiesQuery = this.manager.createQueryBuilder(RentalOrderEntity, 'order');
 		rentalOrderEntitiesQuery = applyFilters(rentalOrderEntitiesQuery, paginationRequest.filters);
-		rentalOrderEntitiesQuery = rentalOrderEntitiesQuery.andWhere('rentalOrder.user_id = :userId', { userId });
+
+		if (userRole === UserRole.Landlord) {
+			rentalOrderEntitiesQuery = rentalOrderEntitiesQuery
+				.leftJoinAndSelect('order.car', 'car')
+				.andWhere('car.user_id = :userId', { userId });
+		} else {
+			rentalOrderEntitiesQuery = rentalOrderEntitiesQuery.andWhere('order.user_id = :userId', { userId });
+		}
 
 		const total = await rentalOrderEntitiesQuery.getCount();
 

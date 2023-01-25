@@ -39,6 +39,15 @@ export class CarImageRepository {
 		return this.convertToModel(carEntity);
 	}
 
+	public async getCarsTitleImages(carIds: Array<number>): Promise<Array<CarImage>> {
+		const carEntities = await this.manager
+			.createQueryBuilder(CarImageEntity, 'carImage')
+			.where({ carId: In(carIds), isTitle: true })
+			.getMany();
+
+		return carEntities.map(carEntity => this.convertToModel(carEntity)) as Array<CarImage>;
+	}
+
 	public async delete(carImageIds: Array<number>): Promise<void> {
 		await this.manager
 			.createQueryBuilder(CarImageEntity, 'carImage')

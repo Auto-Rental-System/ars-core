@@ -49,7 +49,7 @@ export class RentalService {
 		paginationRequest: OrderPaginationRequest,
 		user: User,
 	): Promise<PaginationResponse<RentalOrder>> {
-		const result = await this.rentalOrderRepository.getOrders(paginationRequest, user.id);
+		const result = await this.rentalOrderRepository.getOrders(paginationRequest, user.id, user.role);
 
 		return new PaginationResponse<RentalOrder>(
 			paginationRequest.page,

@@ -80,7 +80,7 @@ export class CarController {
 			list: await Promise.all(
 				result.list.map(async car => {
 					const titleImage = await this.carService.getCarTitleImage(car);
-					return this.carFormatter.toCarListItemResponse(car, titleImage);
+					return this.carFormatter.toCarWithTitleImageResponse(car, titleImage);
 				}),
 			),
 			page: result.page,

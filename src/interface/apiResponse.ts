@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from 'entity/user.entity';
 import { Fuel, Gearbox } from 'entity/car.entity';
 import { PaymentStatus, PaymentType } from 'entity/payment.entity';
-import { CarListOrderBy, Order } from './apiRequest';
+import { CarListOrderBy, Order, OrderListOrderBy, MyCarListOrderBy } from './apiRequest';
 
 export class UserResponse {
 	@ApiProperty()
@@ -109,14 +109,14 @@ export class DetailedCarResponse extends CarResponse {
 	images: Array<CarImageResponse>;
 }
 
-export class CarListItemResponse extends CarResponse {
+export class CarWithTitleImageResponse extends CarResponse {
 	@ApiProperty({ type: CarImageResponse, required: false })
 	titleImage?: CarImageResponse;
 }
 
 export class CarListResponse {
-	@ApiProperty({ isArray: true, type: CarListItemResponse })
-	list: Array<CarListItemResponse>;
+	@ApiProperty({ isArray: true, type: CarWithTitleImageResponse })
+	list: Array<CarWithTitleImageResponse>;
 
 	@ApiProperty()
 	page: number;
@@ -128,12 +128,15 @@ export class CarListResponse {
 	total: number;
 }
 
-export class OwnCarListItemResponse extends CarResponse {
+export class OwnCarListItemResponse extends CarWithTitleImageResponse {
 	@ApiProperty()
 	netValue: number;
+
+	@ApiProperty()
+	totalDaysRented: number;
 }
 
-export class OwnCarListResponse {
+export class MyCarListResponse {
 	@ApiProperty({ isArray: true, type: OwnCarListItemResponse })
 	list: Array<OwnCarListItemResponse>;
 
@@ -148,8 +151,8 @@ export class OwnCarListResponse {
 }
 
 export class OrderListItemResponse {
-	@ApiProperty({ type: CarResponse })
-	car: CarResponse;
+	@ApiProperty({ type: CarWithTitleImageResponse })
+	car: CarWithTitleImageResponse;
 
 	@ApiProperty({ type: RentalOrderResponse })
 	order: RentalOrderResponse;
@@ -191,6 +194,12 @@ export class CarImagesSignedPostUrlResponse {
 export class DevInfoResponse {
 	@ApiProperty({ enum: CarListOrderBy, enumName: 'CarOrderBy' })
 	carOrderBy?: CarListOrderBy;
+
+	@ApiProperty({ enum: OrderListOrderBy, enumName: 'OrderListOrderBy' })
+	orderListOrderBy?: OrderListOrderBy;
+
+	@ApiProperty({ enum: MyCarListOrderBy, enumName: 'MyCarListOrderBy' })
+	myCarListOrderBy?: MyCarListOrderBy;
 
 	@ApiProperty({ enum: Order, enumName: 'Order' })
 	order?: Order;

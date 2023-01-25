@@ -9,6 +9,7 @@ export interface TotalPayment {
 	grossValue: number;
 	paypalFee: number;
 	serviceFee: number;
+	days: number;
 }
 
 export interface TotalPaymentRaw {
@@ -16,6 +17,7 @@ export interface TotalPaymentRaw {
 	gross_value: number;
 	paypal_fee: number;
 	service_fee: number;
+	days: number;
 }
 
 @Injectable()
@@ -48,10 +50,10 @@ export class PaymentRepository {
 		return (await this.getById(identifiers[0].id)) as Payment;
 	}
 
-	public async getByOrderIdsAndType(ids: Array<number>, type: PaymentType): Promise<Array<Payment>> {
+	public async getByOrderIdsAndType(orderIds: Array<number>, type: PaymentType): Promise<Array<Payment>> {
 		const paymentEntities = await this.manager
 			.createQueryBuilder(PaymentEntity, 'payment')
-			.where({ id: In(ids), type })
+			.where({ rentalOrderId: In(orderIds), type })
 			.getMany();
 
 		return paymentEntities.map(paymentEntity => this.convertToModel(paymentEntity)) as Array<Payment>;
@@ -95,11 +97,12 @@ export class PaymentRepository {
 				car_id,
 				SUM(p.gross_value) as gross_value,
 				SUM(p.paypal_fee) as paypal_fee,
-				SUM(p.service_fee) as service_fee
+				SUM(p.service_fee) as service_fee,
+    		SUM(ro.end_at - ro.start_at + 1) as days
 			FROM payment p
 			LEFT JOIN rental_order ro ON p.rental_order_id = ro.id
-			WHERE p.type = ?
-			AND ro.car_id IN (?)
+			WHERE p.type = $1
+			AND ro.car_id = ANY($2)
 			GROUP BY ro.car_id;
 		`,
 			[type, carIds],
@@ -110,6 +113,7 @@ export class PaymentRepository {
 				grossValue: raw.gross_value,
 				paypalFee: raw.paypal_fee,
 				serviceFee: raw.service_fee,
+				days: raw.days,
 			});
 		});
 
