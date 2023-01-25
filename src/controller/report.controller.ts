@@ -48,12 +48,12 @@ export class ReportController {
 			orderBy,
 		);
 
-		const ownCars = await this.carService.getMyCars(paginationRequest, user);
-		const carsTitleImages = await this.carService.getCarsTitleImages(ownCars.list);
+		const myCars = await this.carService.getMyCars(paginationRequest, user);
+		const carsTitleImages = await this.carService.getCarsTitleImages(myCars.list);
 
-		const totalPayments = await this.paymentService.getCarsTotalPayments(ownCars.list, PaymentType.Payout);
+		const totalPayments = await this.paymentService.getCarsTotalPayments(myCars.list, PaymentType.Payout);
 
-		return this.reportFormatter.toMyCarListResponse(ownCars, carsTitleImages, totalPayments);
+		return this.reportFormatter.toMyCarListResponse(myCars, carsTitleImages, totalPayments);
 	}
 
 	@Get('/orders')

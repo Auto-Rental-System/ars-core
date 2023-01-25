@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { OrderListResponse, OwnCarListItemResponse, MyCarListResponse } from 'interface/apiResponse';
+import { OrderListResponse, MyCarListItemResponse, MyCarListResponse } from 'interface/apiResponse';
 import { PaginationResponse } from 'value_object';
 import { Car, CarImage, Payment, RentalOrder } from 'model';
 import { CarFormatter } from 'service/car';
@@ -17,7 +17,7 @@ export class ReportFormatter {
 		titleImages: Array<CarImage>,
 		totalPayments: Map<number, TotalPayment>,
 	): MyCarListResponse {
-		const list: Array<OwnCarListItemResponse> = carsPaginationResponse.list.map(car => {
+		const list: Array<MyCarListItemResponse> = carsPaginationResponse.list.map(car => {
 			const titleImage = titleImages.find(t => t.carId === car.id);
 			const carTotalPayments = totalPayments.get(car.id);
 			const netValue = carTotalPayments

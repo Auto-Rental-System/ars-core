@@ -128,7 +128,7 @@ export class CarListResponse {
 	total: number;
 }
 
-export class OwnCarListItemResponse extends CarWithTitleImageResponse {
+export class MyCarListItemResponse extends CarWithTitleImageResponse {
 	@ApiProperty()
 	netValue: number;
 
@@ -137,8 +137,8 @@ export class OwnCarListItemResponse extends CarWithTitleImageResponse {
 }
 
 export class MyCarListResponse {
-	@ApiProperty({ isArray: true, type: OwnCarListItemResponse })
-	list: Array<OwnCarListItemResponse>;
+	@ApiProperty({ isArray: true, type: MyCarListItemResponse })
+	list: Array<MyCarListItemResponse>;
 
 	@ApiProperty()
 	page: number;
