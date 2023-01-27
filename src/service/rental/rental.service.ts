@@ -37,8 +37,8 @@ export class RentalService {
 		}
 	}
 
-	public async getCarRentalOrders(car: Car): Promise<Array<RentalOrder>> {
-		return await this.rentalOrderRepository.getByCarId(car.id);
+	public async getCarRentalOrders(car: Car, from: Date, to: Date): Promise<Array<RentalOrder>> {
+		return await this.rentalOrderRepository.getByCarIdAndDateRange(car.id, from, to);
 	}
 
 	public async getRentalOrdersToPayout(): Promise<Array<RentalOrder>> {

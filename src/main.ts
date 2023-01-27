@@ -31,7 +31,7 @@ async function bootstrap() {
 
 	app.useGlobalInterceptors(new ErrorInterceptor());
 
-	app.useGlobalPipes(new ValidationPipe());
+	app.useGlobalPipes(new ValidationPipe({ forbidUnknownValues: false }));
 
 	const port = configService.get('port');
 

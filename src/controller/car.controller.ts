@@ -6,8 +6,9 @@ import { UserRole } from 'entity/user.entity';
 import {
 	CarImagesSignedPostUrlResponse,
 	CarListResponse,
+	CarRentalOrdersResponse,
 	CarResponse,
-	DetailedCarResponse,
+	CarWithImagesResponse,
 } from 'interface/apiResponse';
 import { CarListOrderBy, CreateCarRequest, Order, RentCarRequest, UpdateCarRequest } from 'interface/apiRequest';
 import { Request } from 'shared/request';
@@ -89,45 +90,62 @@ export class CarController {
 		};
 	}
 
+	@Get('/:id/rental-orders')
+	@Auth(UserRole.Renter, UserRole.Landlord)
+	@ApiParam({ name: 'id', required: true, type: Number })
+	@ApiQuery({ name: 'from' })
+	@ApiQuery({ name: 'to' })
+	@ApiResponse({ status: HttpStatus.OK, type: CarRentalOrdersResponse })
+	public async getRentalOrders(
+		@Req() { user }: Request,
+		@Param('id', ParseIntPipe) id: number,
+		@Query('from') from: Date,
+		@Query('to') to: Date,
+	): Promise<CarRentalOrdersResponse> {
+		const car = await this.carService.getById(id);
+
+		const rentalOrders = await this.rentalService.getCarRentalOrders(car, from, to);
+
+		return this.carFormatter.toCarRentalOrdersResponse(car, rentalOrders);
+	}
+
 	@Get('/:id')
 	@Auth()
 	@ApiParam({ name: 'id', required: true, type: Number })
-	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
-	public async getById(@Param('id', new ParseIntPipe()) id: number): Promise<DetailedCarResponse> {
+	@ApiResponse({ status: HttpStatus.OK, type: CarWithImagesResponse })
+	public async getById(@Param('id', new ParseIntPipe()) id: number): Promise<CarWithImagesResponse> {
 		const car = await this.carService.getById(id);
-		const rentalOrders = await this.rentalService.getCarRentalOrders(car);
 
 		const carImages = await this.carService.getCarImages(car, true);
 
-		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages);
+		return this.carFormatter.toCarWithImagesResponse(car, carImages);
 	}
 
 	@Put('/:id')
 	@Auth(UserRole.Landlord)
 	@ApiParam({ name: 'id', required: true, type: Number })
-	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
+	@ApiResponse({ status: HttpStatus.OK, type: CarWithImagesResponse })
 	public async update(
 		@Param('id', ParseIntPipe) id: number,
 		@Body() body: UpdateCarRequest,
-	): Promise<DetailedCarResponse> {
+	): Promise<CarWithImagesResponse> {
 		let car = await this.carService.getById(id);
 
 		car = await this.carService.updateCar(car, body);
 		const carImages = await this.carService.updateCarImages(car, body.images);
-		const rentalOrders = await this.rentalService.getCarRentalOrders(car);
 
-		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages);
+		return this.carFormatter.toCarWithImagesResponse(car, carImages);
 	}
 
 	@Post('/:id/order')
 	@Auth(UserRole.Renter)
 	@ApiParam({ name: 'id', required: true, type: Number })
-	@ApiResponse({ status: HttpStatus.OK, type: DetailedCarResponse })
+	@ApiResponse({ status: HttpStatus.OK, type: CarWithImagesResponse })
 	public async rent(
 		@Req() { user }: Request,
 		@Param('id', ParseIntPipe) id: number,
 		@Body() body: RentCarRequest,
-	): Promise<DetailedCarResponse> {
+	): Promise<CarWithImagesResponse> {
 		const car = await this.carService.getById(id);
 
 		await this.paypalService.ensureCarRentalWasPaid(car, body);
@@ -138,9 +156,8 @@ export class CarController {
 
 		await this.paymentService.createCheckoutPayment(body.orderId, rentalOrder);
 
-		const rentalOrders = await this.rentalService.getCarRentalOrders(car);
 		const carImages = await this.carService.getCarImages(car, true);
 
-		return this.carFormatter.toDetailedCarResponse(car, rentalOrders, carImages);
+		return this.carFormatter.toCarWithImagesResponse(car, carImages);
 	}
 }

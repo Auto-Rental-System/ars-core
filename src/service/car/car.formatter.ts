@@ -6,8 +6,9 @@ import {
 	CarImagesSignedPostUrlResponse,
 	CarWithTitleImageResponse,
 	CarResponse,
-	DetailedCarResponse,
+	CarWithImagesResponse,
 	RentalOrderResponse,
+	CarRentalOrdersResponse,
 } from 'interface/apiResponse';
 import { SignedPostUrlResponse } from 'service/storage';
 
@@ -42,17 +43,20 @@ export class CarFormatter {
 			endAt: order.endAt,
 			id: order.id,
 			carId: order.carId,
+			userId: order.userId,
 		};
 	}
 
-	public toDetailedCarResponse(
-		car: Car,
-		rentalOrders: Array<RentalOrder>,
-		carImages: Array<CarImage>,
-	): DetailedCarResponse {
+	public toCarRentalOrdersResponse(car: Car, rentalOrders: Array<RentalOrder>): CarRentalOrdersResponse {
+		return {
+			carId: car.id,
+			rentalOrders: rentalOrders.map(r => this.toRentalOrderResponse(r)),
+		};
+	}
+
+	public toCarWithImagesResponse(car: Car, carImages: Array<CarImage>): CarWithImagesResponse {
 		return {
 			...this.toCarResponse(car),
-			rentalOrders: rentalOrders.map(order => this.toRentalOrderResponse(order)),
 			images: carImages.map(image => this.toCarImageResponse(image)),
 		};
 	}
