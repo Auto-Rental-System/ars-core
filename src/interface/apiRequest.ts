@@ -12,7 +12,7 @@ export enum CarListOrderBy {
 	EngineCapacity = 'car.engine_capacity',
 }
 
-export enum OwnCarListOrderBy {
+export enum MyCarListOrderBy {
 	CarId = 'car.id',
 }
 

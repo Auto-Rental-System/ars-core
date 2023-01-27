@@ -11,7 +11,7 @@ import { CarPaginationRequest } from 'value_object/pagination_request/car_pagina
 import { StorageService, SignedPostUrlResponse } from 'service/storage';
 import { CarConfig } from 'config/interfaces';
 import { Result } from 'shared/util/util';
-import { OwnCarPaginationRequest } from 'value_object/pagination_request';
+import { MyCarPaginationRequest } from 'value_object/pagination_request';
 
 @Injectable()
 export class CarService {
@@ -80,13 +80,26 @@ export class CarService {
 	public async getCarTitleImage(car: Car): Promise<Result<CarImage>> {
 		const titleImage = await this.carImageRepository.getCarTitleImage(car.id);
 		if (!titleImage) {
-			return titleImage;
+			return;
 		}
 
 		const key = this.getS3CarImageKey(car, titleImage);
 		titleImage.url = await this.storageService.getSignedGetUrl(key);
 
 		return titleImage;
+	}
+
+	public async getCarsTitleImages(cars: Array<Car>): Promise<Array<CarImage>> {
+		const carIds = cars.map(c => c.id);
+		const titleImages = await this.carImageRepository.getCarsTitleImages(carIds);
+
+		for (const image of titleImages) {
+			const car = cars.find(c => c.id === image.carId) as Car;
+			const key = this.getS3CarImageKey(car, image);
+			image.url = await this.storageService.getSignedGetUrl(key);
+		}
+
+		return titleImages;
 	}
 
 	// Please, make sure that you upload images that belong to one car
@@ -172,8 +185,8 @@ export class CarService {
 		);
 	}
 
-	public async getOwnCars(paginationRequest: OwnCarPaginationRequest, user: User): Promise<PaginationResponse<Car>> {
-		const result = await this.carRepository.getOwnCars(paginationRequest, user.id);
+	public async getMyCars(paginationRequest: MyCarPaginationRequest, user: User): Promise<PaginationResponse<Car>> {
+		const result = await this.carRepository.getMyCars(paginationRequest, user.id);
 
 		return new PaginationResponse<Car>(
 			paginationRequest.page,

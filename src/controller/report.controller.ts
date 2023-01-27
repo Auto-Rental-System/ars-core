@@ -6,10 +6,11 @@ import { Request } from 'shared/request';
 import { UserRole } from 'entity/user.entity';
 import { CarService } from 'service/car';
 import { PaymentService } from 'service/payment';
-import { OrderPaginationRequest, OwnCarPaginationRequest } from 'value_object/pagination_request';
+import { OrderPaginationRequest } from 'value_object/pagination_request/order_pagination_request';
+import { MyCarPaginationRequest } from 'value_object/pagination_request/my_car_pagination_request';
 import { PaymentType } from 'entity/payment.entity';
-import { OrderListResponse, OwnCarListResponse } from 'interface/apiResponse';
-import { Order, OrderListOrderBy, OwnCarListOrderBy } from 'interface/apiRequest';
+import { OrderListResponse, MyCarListResponse } from 'interface/apiResponse';
+import { Order, OrderListOrderBy, MyCarListOrderBy } from 'interface/apiRequest';
 import { ReportFormatter } from 'service/report';
 import { RentalService } from 'service/rental';
 
@@ -28,18 +29,18 @@ export class ReportController {
 	@ApiQuery({ name: 'page', type: Number })
 	@ApiQuery({ name: 'rowsPerPage', type: Number })
 	@ApiQuery({ name: 'order', enum: Order, required: false, enumName: 'Order' })
-	@ApiQuery({ name: 'orderBy', enum: OwnCarListOrderBy, required: false, enumName: 'OwnCarListOrderBy', type: String })
+	@ApiQuery({ name: 'orderBy', enum: MyCarListOrderBy, required: false, enumName: 'MyCarListOrderBy', type: String })
 	@ApiQuery({ name: 'filters', isArray: true, type: String, required: false })
-	@ApiResponse({ status: HttpStatus.OK, type: OwnCarListResponse })
+	@ApiResponse({ status: HttpStatus.OK, type: MyCarListResponse })
 	public async getMyCarsReport(
 		@Req() { user }: Request,
 		@Query('page', ParseIntPipe) page: number,
 		@Query('rowsPerPage', ParseIntPipe) rowsPerPage: number,
 		@Query('order') order: Order = Order.Asc,
-		@Query('orderBy') orderBy: OwnCarListOrderBy = OwnCarListOrderBy.CarId,
+		@Query('orderBy') orderBy: MyCarListOrderBy = MyCarListOrderBy.CarId,
 		@Query('filters') filters: string | Array<string> = [],
-	): Promise<OwnCarListResponse> {
-		const paginationRequest = new OwnCarPaginationRequest(
+	): Promise<MyCarListResponse> {
+		const paginationRequest = new MyCarPaginationRequest(
 			page,
 			rowsPerPage,
 			Array.isArray(filters) ? filters : [filters],
@@ -47,10 +48,12 @@ export class ReportController {
 			orderBy,
 		);
 
-		const ownCars = await this.carService.getOwnCars(paginationRequest, user);
-		const totalPayments = await this.paymentService.getCarsTotalPayments(ownCars.list, PaymentType.Payout);
+		const myCars = await this.carService.getMyCars(paginationRequest, user);
+		const carsTitleImages = await this.carService.getCarsTitleImages(myCars.list);
 
-		return this.reportFormatter.toOwnCarListResponse(ownCars, totalPayments);
+		const totalPayments = await this.paymentService.getCarsTotalPayments(myCars.list, PaymentType.Payout);
+
+		return this.reportFormatter.toMyCarListResponse(myCars, carsTitleImages, totalPayments);
 	}
 
 	@Get('/orders')
@@ -81,10 +84,11 @@ export class ReportController {
 
 		const carIds = orders.list.map(order => order.carId);
 		const cars = await this.carService.getByIds(carIds);
+		const carsTitleImages = await this.carService.getCarsTitleImages(cars);
 
 		const paymentType = user.is(UserRole.Landlord) ? PaymentType.Payout : PaymentType.Checkout;
 		const payments = await this.paymentService.getByOrdersAndType(orders.list, paymentType);
 
-		return this.reportFormatter.toOrderListResponse(orders, cars, payments);
+		return this.reportFormatter.toOrderListResponse(orders, cars, carsTitleImages, payments);
 	}
 }

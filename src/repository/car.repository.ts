@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { Result } from 'shared/util/util';
 import { Car } from 'model';
 import { CarEntity } from 'entity/car.entity';
-import { CarPaginationRequest, OwnCarPaginationRequest } from 'value_object/pagination_request';
+import { CarPaginationRequest, MyCarPaginationRequest } from 'value_object/pagination_request';
 import { applyFilters, applyPaginationParams, ListWithTotal } from 'shared/util/typeorm';
 
 @Injectable()
@@ -84,7 +84,7 @@ export class CarRepository {
 		};
 	}
 
-	public async getOwnCars(paginationRequest: OwnCarPaginationRequest, userId: number): Promise<ListWithTotal<Car>> {
+	public async getMyCars(paginationRequest: MyCarPaginationRequest, userId: number): Promise<ListWithTotal<Car>> {
 		let carEntitiesQuery = this.manager.createQueryBuilder(CarEntity, 'car');
 		carEntitiesQuery = applyFilters(carEntitiesQuery, paginationRequest.filters);
 		carEntitiesQuery = carEntitiesQuery.andWhere('car.user_id = :userId', { userId });

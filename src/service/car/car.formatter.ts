@@ -4,7 +4,7 @@ import { Car, CarImage, RentalOrder, User } from 'model';
 import {
 	CarImageResponse,
 	CarImagesSignedPostUrlResponse,
-	CarListItemResponse,
+	CarWithTitleImageResponse,
 	CarResponse,
 	DetailedCarResponse,
 	RentalOrderResponse,
@@ -57,7 +57,7 @@ export class CarFormatter {
 		};
 	}
 
-	public toCarListItemResponse(car: Car, titleImage?: CarImage): CarListItemResponse {
+	public toCarWithTitleImageResponse(car: Car, titleImage?: CarImage): CarWithTitleImageResponse {
 		return {
 			...this.toCarResponse(car),
 			titleImage: titleImage && this.toCarImageResponse(titleImage),

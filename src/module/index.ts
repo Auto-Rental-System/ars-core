@@ -4,3 +4,4 @@ export { CarModule } from './car.module';
 export { AuthModule } from './auth.module';
 export { CronModule } from './cron.module';
 export { WebhookModule } from './webhook.module';
+export { ReportModule } from './report.module';

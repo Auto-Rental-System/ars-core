@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { OrderListResponse, OwnCarListResponse } from 'interface/apiResponse';
+import { OrderListResponse, MyCarListItemResponse, MyCarListResponse } from 'interface/apiResponse';
 import { PaginationResponse } from 'value_object';
-import { Car, Payment, RentalOrder } from 'model';
+import { Car, CarImage, Payment, RentalOrder } from 'model';
 import { CarFormatter } from 'service/car';
 import { TotalPayment } from 'repository/payment_repository';
 import { toDoublePrecisionFloat } from 'shared/util/util';
@@ -12,18 +12,22 @@ import { PaymentFormatter } from 'service/payment';
 export class ReportFormatter {
 	constructor(private readonly carFormatter: CarFormatter, private readonly paymentFormatter: PaymentFormatter) {}
 
-	public toOwnCarListResponse(
+	public toMyCarListResponse(
 		carsPaginationResponse: PaginationResponse<Car>,
+		titleImages: Array<CarImage>,
 		totalPayments: Map<number, TotalPayment>,
-	): OwnCarListResponse {
-		const list = carsPaginationResponse.list.map(car => {
+	): MyCarListResponse {
+		const list: Array<MyCarListItemResponse> = carsPaginationResponse.list.map(car => {
+			const titleImage = titleImages.find(t => t.carId === car.id);
 			const carTotalPayments = totalPayments.get(car.id);
 			const netValue = carTotalPayments
 				? carTotalPayments.grossValue - carTotalPayments.paypalFee - carTotalPayments.serviceFee
 				: 0;
+
 			return {
-				...this.carFormatter.toCarResponse(car),
+				...this.carFormatter.toCarWithTitleImageResponse(car, titleImage),
 				netValue: toDoublePrecisionFloat(netValue),
+				totalDaysRented: carTotalPayments?.days || 0,
 			};
 		});
 
@@ -38,15 +42,17 @@ export class ReportFormatter {
 	public toOrderListResponse(
 		ordersPaginationResponse: PaginationResponse<RentalOrder>,
 		cars: Array<Car>,
+		carsTitleImages: Array<CarImage>,
 		payments: Array<Payment>,
 	): OrderListResponse {
 		return {
 			list: ordersPaginationResponse.list.map(order => {
 				const car = cars.find(car => car.id === order.carId);
+				const titleImage = car && carsTitleImages.find(c => c.carId === car.id);
 				const payment = payments.find(payment => payment.rentalOrderId === order.id);
 
 				return {
-					car: this.carFormatter.toCarResponse(car as Car),
+					car: this.carFormatter.toCarWithTitleImageResponse(car as Car, titleImage),
 					payment: this.paymentFormatter.toPaymentResponse(payment as Payment),
 					order: this.carFormatter.toRentalOrderResponse(order),
 				};
