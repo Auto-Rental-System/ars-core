@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Brackets, EntityManager } from 'typeorm';
+import { Brackets, EntityManager, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 
 import { RentalOrder } from 'model';
 import { Result } from 'shared/util/util';
@@ -19,8 +19,12 @@ export class RentalOrderRepository {
 		return this.convertToModel(rentalOrderEntity);
 	}
 
-	public async getByCarId(carId: number): Promise<Array<RentalOrder>> {
-		const rentalOrderEntities = await this.manager.find(RentalOrderEntity, { carId });
+	public async getByCarIdAndDateRange(carId: number, from: Date, to: Date): Promise<Array<RentalOrder>> {
+		const rentalOrderEntities = await this.manager.find(RentalOrderEntity, {
+			carId,
+			endAt: MoreThanOrEqual(from.toISOString()),
+			startAt: LessThanOrEqual(to.toISOString()),
+		});
 
 		return rentalOrderEntities.map(order => this.convertToModel(order)) as Array<RentalOrder>;
 	}

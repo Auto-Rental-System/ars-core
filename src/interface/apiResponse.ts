@@ -88,6 +88,9 @@ export class RentalOrderResponse {
 
 	@ApiProperty({ type: Number })
 	carId: number;
+
+	@ApiProperty({ type: Number })
+	userId: number;
 }
 
 export class CarImageResponse {
@@ -101,10 +104,7 @@ export class CarImageResponse {
 	isTitle: boolean;
 }
 
-export class DetailedCarResponse extends CarResponse {
-	@ApiProperty({ isArray: true, type: RentalOrderResponse })
-	rentalOrders: Array<RentalOrderResponse>;
-
+export class CarWithImagesResponse extends CarResponse {
 	@ApiProperty({ type: CarImageResponse, isArray: true })
 	images: Array<CarImageResponse>;
 }
@@ -112,6 +112,14 @@ export class DetailedCarResponse extends CarResponse {
 export class CarWithTitleImageResponse extends CarResponse {
 	@ApiProperty({ type: CarImageResponse, required: false })
 	titleImage?: CarImageResponse;
+}
+
+export class CarRentalOrdersResponse {
+	@ApiProperty()
+	carId: number;
+
+	@ApiProperty({ isArray: true, type: RentalOrderResponse })
+	rentalOrders: Array<RentalOrderResponse>;
 }
 
 export class CarListResponse {
