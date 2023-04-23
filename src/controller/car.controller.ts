@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Auth } from 'shared/decorator';
@@ -11,12 +11,13 @@ import {
 	CarWithImagesResponse,
 } from 'interface/apiResponse';
 import { CarListOrderBy, CreateCarRequest, Order, RentCarRequest, UpdateCarRequest } from 'interface/apiRequest';
-import { Request } from 'shared/request';
+import { RequestingUser } from 'shared/decorator';
 import { CarFormatter, CarService } from 'service/car';
 import { RentalService } from 'service/rental';
 import { PaypalService } from 'service/paypal';
 import { PaymentService } from 'service/payment';
 import { CarPaginationRequest } from 'value_object/pagination_request/car_pagination_request';
+import { User } from 'model';
 
 @Controller('cars')
 @ApiTags('Car')
@@ -32,7 +33,7 @@ export class CarController {
 	@Post()
 	@Auth(UserRole.Landlord)
 	@ApiResponse({ status: HttpStatus.OK, type: CarResponse })
-	public async create(@Req() { user }: Request, @Body() body: CreateCarRequest): Promise<CarResponse> {
+	public async create(@RequestingUser() user: User, @Body() body: CreateCarRequest): Promise<CarResponse> {
 		const car = await this.carService.create(body, user);
 		return this.carFormatter.toCarResponse(car);
 	}
@@ -43,7 +44,7 @@ export class CarController {
 	@ApiQuery({ name: 'filenames', isArray: true, type: String })
 	@ApiResponse({ status: HttpStatus.OK, type: CarImagesSignedPostUrlResponse })
 	public async getImagesSignedPostUrls(
-		@Req() { user }: Request,
+		@RequestingUser() user: User,
 		@Param('id', ParseIntPipe) id: number,
 		@Query('filenames') filenames: Array<string>,
 	): Promise<CarImagesSignedPostUrlResponse> {
@@ -97,7 +98,7 @@ export class CarController {
 	@ApiQuery({ name: 'to' })
 	@ApiResponse({ status: HttpStatus.OK, type: CarRentalOrdersResponse })
 	public async getRentalOrders(
-		@Req() { user }: Request,
+		@RequestingUser() user: User,
 		@Param('id', ParseIntPipe) id: number,
 		@Query('from') from: Date,
 		@Query('to') to: Date,
@@ -142,7 +143,7 @@ export class CarController {
 	@ApiParam({ name: 'id', required: true, type: Number })
 	@ApiResponse({ status: HttpStatus.OK, type: CarWithImagesResponse })
 	public async rent(
-		@Req() { user }: Request,
+		@RequestingUser() user: User,
 		@Param('id', ParseIntPipe) id: number,
 		@Body() body: RentCarRequest,
 	): Promise<CarWithImagesResponse> {

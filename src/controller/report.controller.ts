@@ -1,8 +1,7 @@
-import { Controller, Get, HttpStatus, ParseIntPipe, Query, Req } from '@nestjs/common';
+import { Controller, Get, HttpStatus, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { Auth } from 'shared/decorator';
-import { Request } from 'shared/request';
+import { Auth, RequestingUser } from 'shared/decorator';
 import { UserRole } from 'entity/user.entity';
 import { CarService } from 'service/car';
 import { PaymentService } from 'service/payment';
@@ -13,6 +12,7 @@ import { OrderListResponse, MyCarListResponse } from 'interface/apiResponse';
 import { Order, OrderListOrderBy, MyCarListOrderBy } from 'interface/apiRequest';
 import { ReportFormatter } from 'service/report';
 import { RentalService } from 'service/rental';
+import { User } from 'model';
 
 @Controller('reports')
 @ApiTags('Report')
@@ -33,7 +33,7 @@ export class ReportController {
 	@ApiQuery({ name: 'filters', isArray: true, type: String, required: false })
 	@ApiResponse({ status: HttpStatus.OK, type: MyCarListResponse })
 	public async getMyCarsReport(
-		@Req() { user }: Request,
+		@RequestingUser() user: User,
 		@Query('page', ParseIntPipe) page: number,
 		@Query('rowsPerPage', ParseIntPipe) rowsPerPage: number,
 		@Query('order') order: Order = Order.Asc,
@@ -65,7 +65,7 @@ export class ReportController {
 	@ApiQuery({ name: 'filters', isArray: true, type: String, required: false })
 	@ApiResponse({ status: HttpStatus.OK, type: OrderListResponse })
 	public async getMyOrders(
-		@Req() { user }: Request,
+		@RequestingUser() user: User,
 		@Query('page', ParseIntPipe) page: number,
 		@Query('rowsPerPage', ParseIntPipe) rowsPerPage: number,
 		@Query('order') order: Order = Order.Asc,
